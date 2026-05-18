@@ -1,3 +1,4 @@
+```javascript id="2r5m8k"
 /* =========================
    CONFIG
 ========================= */
@@ -17,18 +18,14 @@ const API_URL =
 
 document.addEventListener(
   'DOMContentLoaded',
-  () => {
-
-    carregarCertificado();
-
-  }
+  carregarCertificado
 );
 
 /* =========================
    CARREGAR CERTIFICADO
 ========================= */
 
-async function carregarCertificado() {
+async function carregarCertificado(){
 
   const resultado =
     document.getElementById('resultado');
@@ -41,29 +38,44 @@ async function carregarCertificado() {
   const codigo =
     params.get('codigo');
 
-  if (!codigo) {
+  if(!codigo){
 
-    renderizarCodigoAusente();
+    resultado.innerHTML = `
+
+      <div class="card">
+
+        <div class="invalid">
+          ⚠️ Código não informado
+        </div>
+
+      </div>
+
+    `;
 
     return;
 
   }
 
-  try {
+  try{
 
     const response =
       await fetch(API_URL, {
 
+        method: 'GET',
+
         headers: {
-          'X-Access-Key': ACCESS_KEY
+
+          'X-Access-Key':
+            ACCESS_KEY
+
         }
 
       });
 
-    if (!response.ok) {
+    if(!response.ok){
 
       throw new Error(
-        `Erro HTTP: ${response.status}`
+        `Erro HTTP ${response.status}`
       );
 
     }
@@ -71,260 +83,169 @@ async function carregarCertificado() {
     const data =
       await response.json();
 
+    console.log(
+      'Dados recebidos:',
+      data
+    );
+
     const certificados =
       data.record || [];
 
     const certificado =
       certificados.find(item =>
+
         item.codigo.toUpperCase() ===
         codigo.toUpperCase()
+
       );
 
-    if (certificado) {
+    if(certificado){
 
-      renderizarCertificado(
-        certificado
-      );
+      resultado.innerHTML = `
+
+        <div class="card">
+
+          <div class="valid">
+            ✅ Certificado Autêntico
+          </div>
+
+          <div class="info-grid">
+
+            <div class="info">
+              <div class="info-label">
+                Nome
+              </div>
+
+              <div class="info-value">
+                ${certificado.nome}
+              </div>
+            </div>
+
+            <div class="info">
+              <div class="info-label">
+                CPF
+              </div>
+
+              <div class="info-value">
+                ${certificado.cpf}
+              </div>
+            </div>
+
+            <div class="info">
+              <div class="info-label">
+                Curso
+              </div>
+
+              <div class="info-value">
+                ${certificado.curso}
+              </div>
+            </div>
+
+            <div class="info">
+              <div class="info-label">
+                Código
+              </div>
+
+              <div class="info-value">
+                ${certificado.codigo}
+              </div>
+            </div>
+
+            <div class="info">
+              <div class="info-label">
+                Carga Horária
+              </div>
+
+              <div class="info-value">
+                ${certificado.carga_horaria}h
+              </div>
+            </div>
+
+            <div class="info">
+              <div class="info-label">
+                Aproveitamento
+              </div>
+
+              <div class="info-value">
+                ${certificado.aproveitamento}%
+              </div>
+            </div>
+
+            <div class="info">
+              <div class="info-label">
+                Data
+              </div>
+
+              <div class="info-value">
+                ${certificado.data_certificacao}
+              </div>
+            </div>
+
+          </div>
+
+          <div class="preview-item">
+
+            <div class="preview-label">
+              Conteúdo Programático
+            </div>
+
+            <ul>
+
+              ${certificado.conteudo
+                .map(item =>
+                  `<li>${item}</li>`
+                )
+                .join('')
+              }
+
+            </ul>
+
+          </div>
+
+        </div>
+
+      `;
 
     } else {
 
-      renderizarNaoEncontrado();
+      resultado.innerHTML = `
+
+        <div class="card">
+
+          <div class="invalid">
+            ❌ Certificado não encontrado
+          </div>
+
+        </div>
+
+      `;
 
     }
 
-  } catch (error) {
+  } catch(error){
 
     console.error(
-      'Erro ao consultar certificado:',
+      'Erro:',
       error
     );
 
-    renderizarErro(error);
+    resultado.innerHTML = `
+
+      <div class="card">
+
+        <div class="invalid">
+          ⚠️ Erro ao consultar
+        </div>
+
+        <p>
+          ${error.message}
+        </p>
+
+      </div>
+
+    `;
 
   }
 
 }
-
-/* =========================
-   RENDERIZAR CERTIFICADO
-========================= */
-
-function renderizarCertificado(
-  certificado
-) {
-
-  const resultado =
-    document.getElementById(
-      'resultado'
-    );
-
-  if (!resultado) return;
-
-  const conteudoHTML =
-    certificado.conteudo
-      ?.map(
-        item => `<li>${item}</li>`
-      )
-      .join('') || '';
-
-  resultado.innerHTML = `
-
-    <div class="card">
-
-      <div class="valid">
-        ✅ Certificado Autêntico
-      </div>
-
-      <div class="info-grid">
-
-        <div class="info">
-          <div class="info-label">
-            Código
-          </div>
-
-          <div class="info-value">
-            ${certificado.codigo}
-          </div>
-        </div>
-
-        <div class="info">
-          <div class="info-label">
-            Nome do Aluno
-          </div>
-
-          <div class="info-value">
-            ${certificado.nome}
-          </div>
-        </div>
-
-        <div class="info">
-          <div class="info-label">
-            CPF
-          </div>
-
-          <div class="info-value">
-            ${certificado.cpf}
-          </div>
-        </div>
-
-        <div class="info">
-          <div class="info-label">
-            Curso
-          </div>
-
-          <div class="info-value">
-            ${certificado.curso}
-          </div>
-        </div>
-
-        <div class="info">
-          <div class="info-label">
-            Carga Horária
-          </div>
-
-          <div class="info-value">
-            ${certificado.carga_horaria} horas
-          </div>
-        </div>
-
-        <div class="info">
-          <div class="info-label">
-            Aproveitamento
-          </div>
-
-          <div class="info-value">
-            ${certificado.aproveitamento}%
-          </div>
-        </div>
-
-        <div class="info">
-          <div class="info-label">
-            Data da Certificação
-          </div>
-
-          <div class="info-value">
-            ${certificado.data_certificacao}
-          </div>
-        </div>
-
-      </div>
-
-      <div class="preview-item">
-
-        <div class="preview-label">
-          Conteúdo Programático
-        </div>
-
-        <ul>
-          ${conteudoHTML}
-        </ul>
-
-      </div>
-
-    </div>
-
-  `;
-
-}
-
-/* =========================
-   NÃO ENCONTRADO
-========================= */
-
-function renderizarNaoEncontrado() {
-
-  const resultado =
-    document.getElementById(
-      'resultado'
-    );
-
-  if (!resultado) return;
-
-  resultado.innerHTML = `
-
-    <div class="card">
-
-      <div class="invalid">
-        ❌ Certificado não encontrado
-      </div>
-
-      <p>
-        O código informado não existe
-        em nossa base de dados.
-      </p>
-
-    </div>
-
-  `;
-
-}
-
-/* =========================
-   CÓDIGO AUSENTE
-========================= */
-
-function renderizarCodigoAusente() {
-
-  const resultado =
-    document.getElementById(
-      'resultado'
-    );
-
-  if (!resultado) return;
-
-  resultado.innerHTML = `
-
-    <div class="card">
-
-      <div class="invalid">
-        ⚠️ Código não informado
-      </div>
-
-      <p>
-        Nenhum código foi enviado
-        para validação.
-      </p>
-
-    </div>
-
-  `;
-
-}
-
-/* =========================
-   ERRO
-========================= */
-
-function renderizarErro(error) {
-
-  const resultado =
-    document.getElementById(
-      'resultado'
-    );
-
-  if (!resultado) return;
-
-  resultado.innerHTML = `
-
-    <div class="card">
-
-      <div class="invalid">
-        ⚠️ Erro ao consultar
-      </div>
-
-      <p>
-        Não foi possível acessar
-        a base de certificados.
-      </p>
-
-      <br>
-
-      <small>
-        ${error.message}
-      </small>
-
-    </div>
-
-  `;
-
-}
+```
