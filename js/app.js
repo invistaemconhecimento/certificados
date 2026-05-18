@@ -4,9 +4,11 @@
 
 const BIN_ID = '6a0a9e5cc0954111d83cf8b4';
 
+const ACCESS_KEY =
+  '$2a$10$Jvr5LLqOqRb2XULpU2Hq/e39lNLZI0a9KiCRosIG0P3laO7gmviVa';
+
 const API_URL =
   `https://api.jsonbin.io/v3/b/${BIN_ID}/latest`;
-
 /* =========================
    GLOBAL
 ========================= */
