@@ -2,7 +2,11 @@
    CONFIG
 ========================= */
 
-const BIN_ID = '6a0a9e5cc0954111d83cf8b4';
+const BIN_ID =
+  '6a0a9e5cc0954111d83cf8b4';
+
+const ACCESS_KEY =
+  '$2a$10$Jvr5LLqOqRb2XULpU2Hq/e39lNLZI0a9KiCRosIG0P3laO7gmviVa';
 
 const API_URL =
   `https://api.jsonbin.io/v3/b/${BIN_ID}/latest`;
@@ -11,28 +15,33 @@ const API_URL =
    INIT
 ========================= */
 
-document.addEventListener('DOMContentLoaded', () => {
+document.addEventListener(
+  'DOMContentLoaded',
+  () => {
 
-  carregarCertificado();
+    carregarCertificado();
 
-});
+  }
+);
 
 /* =========================
    CARREGAR CERTIFICADO
 ========================= */
 
-async function carregarCertificado(){
+async function carregarCertificado() {
 
   const resultado =
     document.getElementById('resultado');
 
   const params =
-    new URLSearchParams(window.location.search);
+    new URLSearchParams(
+      window.location.search
+    );
 
   const codigo =
     params.get('codigo');
 
-  if(!codigo){
+  if (!codigo) {
 
     renderizarCodigoAusente();
 
@@ -40,14 +49,24 @@ async function carregarCertificado(){
 
   }
 
-  try{
+  try {
 
     const response =
       await fetch(API_URL, {
-  headers: {
-    'X-Access-Key': ACCESS_KEY
-  }
-});
+
+        headers: {
+          'X-Access-Key': ACCESS_KEY
+        }
+
+      });
+
+    if (!response.ok) {
+
+      throw new Error(
+        `Erro HTTP: ${response.status}`
+      );
+
+    }
 
     const data =
       await response.json();
@@ -56,15 +75,16 @@ async function carregarCertificado(){
       data.record || [];
 
     const certificado =
-      certificados.find(
-        item =>
-          item.codigo.toUpperCase() ===
-          codigo.toUpperCase()
+      certificados.find(item =>
+        item.codigo.toUpperCase() ===
+        codigo.toUpperCase()
       );
 
-    if(certificado){
+    if (certificado) {
 
-      renderizarCertificado(certificado);
+      renderizarCertificado(
+        certificado
+      );
 
     } else {
 
@@ -72,30 +92,39 @@ async function carregarCertificado(){
 
     }
 
-  } catch(error){
+  } catch (error) {
 
-    console.error(error);
+    console.error(
+      'Erro ao consultar certificado:',
+      error
+    );
 
-    renderizarErro();
+    renderizarErro(error);
 
   }
 
 }
 
 /* =========================
-   CERTIFICADO VÁLIDO
+   RENDERIZAR CERTIFICADO
 ========================= */
 
-function renderizarCertificado(certificado){
+function renderizarCertificado(
+  certificado
+) {
 
   const resultado =
-    document.getElementById('resultado');
+    document.getElementById(
+      'resultado'
+    );
 
-  if(!resultado) return;
+  if (!resultado) return;
 
   const conteudoHTML =
     certificado.conteudo
-      ?.map(item => `<li>${item}</li>`)
+      ?.map(
+        item => `<li>${item}</li>`
+      )
       .join('') || '';
 
   resultado.innerHTML = `
@@ -202,12 +231,14 @@ function renderizarCertificado(certificado){
    NÃO ENCONTRADO
 ========================= */
 
-function renderizarNaoEncontrado(){
+function renderizarNaoEncontrado() {
 
   const resultado =
-    document.getElementById('resultado');
+    document.getElementById(
+      'resultado'
+    );
 
-  if(!resultado) return;
+  if (!resultado) return;
 
   resultado.innerHTML = `
 
@@ -218,7 +249,8 @@ function renderizarNaoEncontrado(){
       </div>
 
       <p>
-        O código informado não existe em nossa base.
+        O código informado não existe
+        em nossa base de dados.
       </p>
 
     </div>
@@ -231,12 +263,14 @@ function renderizarNaoEncontrado(){
    CÓDIGO AUSENTE
 ========================= */
 
-function renderizarCodigoAusente(){
+function renderizarCodigoAusente() {
 
   const resultado =
-    document.getElementById('resultado');
+    document.getElementById(
+      'resultado'
+    );
 
-  if(!resultado) return;
+  if (!resultado) return;
 
   resultado.innerHTML = `
 
@@ -247,7 +281,8 @@ function renderizarCodigoAusente(){
       </div>
 
       <p>
-        Nenhum código de certificado foi enviado.
+        Nenhum código foi enviado
+        para validação.
       </p>
 
     </div>
@@ -260,24 +295,33 @@ function renderizarCodigoAusente(){
    ERRO
 ========================= */
 
-function renderizarErro(){
+function renderizarErro(error) {
 
   const resultado =
-    document.getElementById('resultado');
+    document.getElementById(
+      'resultado'
+    );
 
-  if(!resultado) return;
+  if (!resultado) return;
 
   resultado.innerHTML = `
 
     <div class="card">
 
       <div class="invalid">
-        ⚠️ Erro de conexão
+        ⚠️ Erro ao consultar
       </div>
 
       <p>
-        Não foi possível acessar a base de certificados.
+        Não foi possível acessar
+        a base de certificados.
       </p>
+
+      <br>
+
+      <small>
+        ${error.message}
+      </small>
 
     </div>
 
