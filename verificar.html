@@ -10,7 +10,7 @@
   >
 
   <title>
-    Verificação de Certificado
+    Validação de Certificado
   </title>
 
   <link
@@ -27,26 +27,65 @@
     <div class="header">
 
       <h1>
-        🎓 Verificação de Certificado
+        🎓 Validação de Certificado
       </h1>
 
       <p class="subtitle">
-        Validação pública de autenticidade.
+        Verificação pública de autenticidade
       </p>
 
     </div>
 
-    <div id="resultado">
-
-      <div class="loading">
-        Carregando certificado...
-      </div>
-
+    <div
+      id="loading"
+      style="display:none;"
+    >
+      Carregando...
     </div>
+
+    <div id="result"></div>
 
   </div>
 
-  <script src="js/verificar.js"></script>
+  <script src="js/app.js"></script>
+
+  <script>
+
+    document.addEventListener(
+      'DOMContentLoaded',
+      () => {
+
+        const params =
+          new URLSearchParams(
+            window.location.search
+          );
+
+        const codigo =
+          params.get('codigo');
+
+        if(codigo){
+
+          const inputFake =
+            document.createElement('input');
+
+          inputFake.type = 'hidden';
+
+          inputFake.id = 'codigo';
+
+          inputFake.value = codigo;
+
+          document.body.appendChild(
+            inputFake
+          );
+
+          verificarCertificado();
+
+        }
+
+      }
+    );
+
+  </script>
 
 </body>
 </html>
