@@ -43,7 +43,11 @@ async function carregarCertificado(){
   try{
 
     const response =
-      await fetch(API_URL);
+      await fetch(API_URL, {
+  headers: {
+    'X-Access-Key': ACCESS_KEY
+  }
+});
 
     const data =
       await response.json();
