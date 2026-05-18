@@ -1,32 +1,77 @@
+
 /* =========================
    CONFIG
 ========================= */
 
-const BIN_ID = '6a0a9e5cc0954111d83cf8b4';
+const BIN_ID =
+  '6a0a9e5cc0954111d83cf8b4';
 
 const ACCESS_KEY =
   '$2a$10$Jvr5LLqOqRb2XULpU2Hq/e39lNLZI0a9KiCRosIG0P3laO7gmviVa';
 
 const API_URL =
   `https://api.jsonbin.io/v3/b/${BIN_ID}/latest`;
+
 /* =========================
    GLOBAL
 ========================= */
 
 let certificados = [];
+
 let jsonGerado = '';
 
 /* =========================
    INIT
 ========================= */
 
-document.addEventListener('DOMContentLoaded', () => {
+document.addEventListener(
+  'DOMContentLoaded',
+  () => {
 
-  carregarCertificados();
+    carregarCertificados();
 
-  preencherCodigoAutomatico();
+    preencherCodigoAutomatico();
 
-});
+  }
+);
+
+/* =========================
+   FETCH PADRÃO
+========================= */
+
+async function buscarDados(){
+
+  const response =
+    await fetch(API_URL, {
+
+      method: 'GET',
+
+      headers: {
+
+        'Content-Type':
+          'application/json',
+
+        'X-Access-Key':
+          ACCESS_KEY,
+
+        'X-Bin-Meta':
+          'false'
+
+      }
+
+    });
+
+  if(!response.ok){
+
+    throw new Error(
+      `Erro HTTP ${response.status}`
+    );
+
+  }
+
+  return await response.json();
+
+}
 
 /* =========================
    CARREGAR CERTIFICADOS
@@ -36,21 +81,20 @@ async function carregarCertificados(){
 
   try{
 
-    const response = await fetch(API_URL, {
-  headers: {
-    'X-Access-Key': ACCESS_KEY
-  }
-});
+    certificados =
+      await buscarDados();
 
-    const data = await response.json();
-
-    certificados = data.record || [];
-
-    console.log('Certificados carregados:', certificados);
+    console.log(
+      'Certificados carregados:',
+      certificados
+    );
 
   } catch(error){
 
-    console.error('Erro ao carregar certificados:', error);
+    console.error(
+      'Erro ao carregar certificados:',
+      error
+    );
 
   }
 
@@ -67,11 +111,15 @@ function preencherCodigoAutomatico(){
 
   if(!inputCodigo) return;
 
-  const numero = String(
-    Math.floor(Math.random() * 9999)
-  ).padStart(4, '0');
+  const numero =
+    String(
+      Math.floor(
+        Math.random() * 9999
+      )
+    ).padStart(4, '0');
 
-  inputCodigo.value = `CERT-${numero}`;
+  inputCodigo.value =
+    `CERT-${numero}`;
 
 }
 
@@ -83,7 +131,11 @@ function formatarData(dataISO){
 
   if(!dataISO) return '';
 
-  const [ano, mes, dia] = dataISO.split('-');
+  const [
+    ano,
+    mes,
+    dia
+  ] = dataISO.split('-');
 
   return `${dia}/${mes}/${ano}`;
 
@@ -133,7 +185,9 @@ function gerarJSON(){
     document.getElementById('conteudo')
     ?.value
     .split('\n')
-    .filter(item => item.trim() !== '');
+    .filter(
+      item => item.trim() !== ''
+    );
 
   if(
     !codigo ||
@@ -142,32 +196,53 @@ function gerarJSON(){
     !curso
   ){
 
-    alert('Preencha os campos obrigatórios.');
+    alert(
+      'Preencha os campos obrigatórios.'
+    );
 
     return;
 
   }
 
   const certificado = {
+
     codigo,
+
     nome,
+
     cpf,
+
     curso,
-    carga_horaria: Number(carga),
-    aproveitamento: Number(aproveitamento),
-    data_certificacao: formatarData(data),
+
+    carga_horaria:
+      Number(carga),
+
+    aproveitamento:
+      Number(aproveitamento),
+
+    data_certificacao:
+      formatarData(data),
+
     conteudo
+
   };
 
   jsonGerado =
-    JSON.stringify(certificado, null, 2);
+    JSON.stringify(
+      certificado,
+      null,
+      2
+    );
 
   const jsonOutput =
-    document.getElementById('jsonOutput');
+    document.getElementById(
+      'jsonOutput'
+    );
 
   if(jsonOutput){
 
-    jsonOutput.textContent = jsonGerado;
+    jsonOutput.textContent =
+      jsonGerado;
 
   }
 
@@ -182,13 +257,16 @@ function gerarJSON(){
 function atualizarPreview(certificado){
 
   const preview =
-    document.getElementById('previewContent');
+    document.getElementById(
+      'previewContent'
+    );
 
   if(!preview) return;
 
   preview.innerHTML = `
 
     <div class="preview-item">
+
       <div class="preview-label">
         Código
       </div>
@@ -196,9 +274,11 @@ function atualizarPreview(certificado){
       <div class="preview-value">
         ${certificado.codigo}
       </div>
+
     </div>
 
     <div class="preview-item">
+
       <div class="preview-label">
         Nome do Aluno
       </div>
@@ -206,9 +286,11 @@ function atualizarPreview(certificado){
       <div class="preview-value">
         ${certificado.nome}
       </div>
+
     </div>
 
     <div class="preview-item">
+
       <div class="preview-label">
         CPF
       </div>
@@ -216,9 +298,11 @@ function atualizarPreview(certificado){
       <div class="preview-value">
         ${certificado.cpf}
       </div>
+
     </div>
 
     <div class="preview-item">
+
       <div class="preview-label">
         Curso
       </div>
@@ -226,9 +310,11 @@ function atualizarPreview(certificado){
       <div class="preview-value">
         ${certificado.curso}
       </div>
+
     </div>
 
     <div class="preview-item">
+
       <div class="preview-label">
         Carga Horária
       </div>
@@ -236,9 +322,11 @@ function atualizarPreview(certificado){
       <div class="preview-value">
         ${certificado.carga_horaria} horas
       </div>
+
     </div>
 
     <div class="preview-item">
+
       <div class="preview-label">
         Aproveitamento
       </div>
@@ -246,9 +334,11 @@ function atualizarPreview(certificado){
       <div class="preview-value">
         ${certificado.aproveitamento}%
       </div>
+
     </div>
 
     <div class="preview-item">
+
       <div class="preview-label">
         Data da Certificação
       </div>
@@ -256,19 +346,27 @@ function atualizarPreview(certificado){
       <div class="preview-value">
         ${certificado.data_certificacao}
       </div>
+
     </div>
 
     <div class="preview-item">
+
       <div class="preview-label">
         Conteúdo Programático
       </div>
 
       <ul>
+
         ${certificado.conteudo
-          .map(item => `<li>${item}</li>`)
+          .map(
+            item =>
+              `<li>${item}</li>`
+          )
           .join('')
         }
+
       </ul>
+
     </div>
 
   `;
@@ -283,15 +381,21 @@ function copiarJSON(){
 
   if(!jsonGerado){
 
-    alert('Nenhum JSON gerado.');
+    alert(
+      'Nenhum JSON gerado.'
+    );
 
     return;
 
   }
 
-  navigator.clipboard.writeText(jsonGerado);
+  navigator.clipboard.writeText(
+    jsonGerado
+  );
 
-  alert('JSON copiado com sucesso.');
+  alert(
+    'JSON copiado com sucesso.'
+  );
 
 }
 
@@ -322,43 +426,43 @@ async function verificarCertificado(){
 
   if(loading){
 
-    loading.style.display = 'block';
+    loading.style.display =
+      'block';
 
   }
 
   if(result){
 
-    result.style.display = 'none';
+    result.style.display =
+      'none';
 
   }
 
   try{
 
-    const response = await fetch(API_URL, {
-  headers: {
-    'X-Access-Key': ACCESS_KEY
-  }
-});
+    const lista =
+      await buscarDados();
 
-    const data = await response.json();
+    const certificado =
+      lista.find(item =>
 
-    const lista = data.record || [];
-
-    const certificado = lista.find(
-      item =>
         item.codigo.toUpperCase() ===
         codigo.toUpperCase()
-    );
+
+      );
 
     if(loading){
 
-      loading.style.display = 'none';
+      loading.style.display =
+        'none';
 
     }
 
     if(certificado){
 
-      renderizarCertificado(certificado);
+      renderizarCertificado(
+        certificado
+      );
 
     } else {
 
@@ -372,7 +476,8 @@ async function verificarCertificado(){
 
     if(loading){
 
-      loading.style.display = 'none';
+      loading.style.display =
+        'none';
 
     }
 
@@ -386,10 +491,14 @@ async function verificarCertificado(){
    RENDER VALID
 ========================= */
 
-function renderizarCertificado(certificado){
+function renderizarCertificado(
+  certificado
+){
 
   const result =
-    document.getElementById('result');
+    document.getElementById(
+      'result'
+    );
 
   if(!result) return;
 
@@ -404,6 +513,7 @@ function renderizarCertificado(certificado){
       <div class="info-grid">
 
         <div class="info">
+
           <div class="info-label">
             Código
           </div>
@@ -411,9 +521,11 @@ function renderizarCertificado(certificado){
           <div class="info-value">
             ${certificado.codigo}
           </div>
+
         </div>
 
         <div class="info">
+
           <div class="info-label">
             Aluno
           </div>
@@ -421,9 +533,11 @@ function renderizarCertificado(certificado){
           <div class="info-value">
             ${certificado.nome}
           </div>
+
         </div>
 
         <div class="info">
+
           <div class="info-label">
             CPF
           </div>
@@ -431,9 +545,11 @@ function renderizarCertificado(certificado){
           <div class="info-value">
             ${certificado.cpf}
           </div>
+
         </div>
 
         <div class="info">
+
           <div class="info-label">
             Curso
           </div>
@@ -441,9 +557,11 @@ function renderizarCertificado(certificado){
           <div class="info-value">
             ${certificado.curso}
           </div>
+
         </div>
 
         <div class="info">
+
           <div class="info-label">
             Carga Horária
           </div>
@@ -451,9 +569,11 @@ function renderizarCertificado(certificado){
           <div class="info-value">
             ${certificado.carga_horaria}h
           </div>
+
         </div>
 
         <div class="info">
+
           <div class="info-label">
             Aproveitamento
           </div>
@@ -461,9 +581,11 @@ function renderizarCertificado(certificado){
           <div class="info-value">
             ${certificado.aproveitamento}%
           </div>
+
         </div>
 
         <div class="info">
+
           <div class="info-label">
             Data da Certificação
           </div>
@@ -471,6 +593,7 @@ function renderizarCertificado(certificado){
           <div class="info-value">
             ${certificado.data_certificacao}
           </div>
+
         </div>
 
       </div>
@@ -482,10 +605,15 @@ function renderizarCertificado(certificado){
         </div>
 
         <ul>
+
           ${certificado.conteudo
-            .map(item => `<li>${item}</li>`)
+            .map(
+              item =>
+                `<li>${item}</li>`
+            )
             .join('')
           }
+
         </ul>
 
       </div>
@@ -494,7 +622,8 @@ function renderizarCertificado(certificado){
 
   `;
 
-  result.style.display = 'block';
+  result.style.display =
+    'block';
 
 }
 
@@ -505,7 +634,9 @@ function renderizarCertificado(certificado){
 function renderizarNaoEncontrado(){
 
   const result =
-    document.getElementById('result');
+    document.getElementById(
+      'result'
+    );
 
   if(!result) return;
 
@@ -525,7 +656,8 @@ function renderizarNaoEncontrado(){
 
   `;
 
-  result.style.display = 'block';
+  result.style.display =
+    'block';
 
 }
 
@@ -536,7 +668,9 @@ function renderizarNaoEncontrado(){
 function renderizarErro(){
 
   const result =
-    document.getElementById('result');
+    document.getElementById(
+      'result'
+    );
 
   if(!result) return;
 
@@ -556,6 +690,8 @@ function renderizarErro(){
 
   `;
 
-  result.style.display = 'block';
+  result.style.display =
+    'block';
 
 }
+
