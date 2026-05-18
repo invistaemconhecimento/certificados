@@ -1,374 +1,227 @@
-<!DOCTYPE html>
-<html lang="pt-BR">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+/* =========================
+   CONFIG
+========================= */
 
-  <!-- CSS -->
-  <link rel="stylesheet" href="css/style.css">
-  
-  <title>Verificação de Certificado</title>
+const BIN_ID =
+  '6a0a9e5cc0954111d83cf8b4';
 
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+const ACCESS_KEY =
+  '$2a$10$Jvr5LLqOqRb2XULpU2Hq/e39lNLZI0a9KiCRosIG0P3laO7gmviVa';
 
-  <link
-    href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap"
-    rel="stylesheet"
-  >
+const API_URL =
+  `https://api.jsonbin.io/v3/b/${BIN_ID}/latest`;
 
-  <style>
+/* =========================
+   INIT
+========================= */
 
-    *{
-      margin:0;
-      padding:0;
-      box-sizing:border-box;
-    }
+document.addEventListener(
+  'DOMContentLoaded',
+  carregarCertificado
+);
 
-    body{
-      font-family:'Inter', sans-serif;
-      background:#f1f5f9;
-      min-height:100vh;
-      display:flex;
-      align-items:center;
-      justify-content:center;
-      padding:20px;
-      color:#0f172a;
-    }
+/* =========================
+   CARREGAR CERTIFICADO
+========================= */
 
-    .container{
-      width:100%;
-      max-width:700px;
-      background:#ffffff;
-      border-radius:24px;
-      padding:40px;
-      box-shadow:0 15px 40px rgba(0,0,0,0.08);
-    }
+async function carregarCertificado(){
 
-    .header{
-      text-align:center;
-      margin-bottom:30px;
-    }
+  const resultado =
+    document.getElementById('resultado');
 
-    .icon{
-      width:90px;
-      height:90px;
-      margin:0 auto 20px;
-      background:#2563eb;
-      border-radius:22px;
-      display:flex;
-      align-items:center;
-      justify-content:center;
-      font-size:42px;
-      color:#fff;
-    }
+  const params =
+    new URLSearchParams(
+      window.location.search
+    );
 
-    h1{
-      font-size:32px;
-      margin-bottom:10px;
-    }
+  const codigo =
+    params.get('codigo');
 
-    .subtitle{
-      color:#64748b;
-      line-height:1.6;
-    }
+  if(!codigo){
 
-    .loading{
-      text-align:center;
-      color:#64748b;
-      padding:30px;
-      font-size:18px;
-    }
+    resultado.innerHTML = `
 
-    .card{
-      background:#f8fafc;
-      border:1px solid #e2e8f0;
-      border-radius:20px;
-      padding:30px;
-    }
+      <div class="card">
 
-    .status-valid{
-      color:#16a34a;
-      font-size:24px;
-      font-weight:700;
-      margin-bottom:25px;
-    }
+        <div class="invalid">
+          ⚠️ Código não informado
+        </div>
 
-    .status-invalid{
-      color:#dc2626;
-      font-size:24px;
-      font-weight:700;
-      margin-bottom:20px;
-    }
-
-    .grid{
-      display:grid;
-      grid-template-columns:1fr 1fr;
-      gap:20px;
-      margin-top:20px;
-    }
-
-    .info{
-      background:#fff;
-      border-radius:14px;
-      padding:16px;
-      border:1px solid #e2e8f0;
-    }
-
-    .label{
-      font-size:13px;
-      color:#64748b;
-      margin-bottom:6px;
-    }
-
-    .value{
-      font-size:17px;
-      font-weight:600;
-      word-break:break-word;
-    }
-
-    .conteudo{
-      margin-top:25px;
-    }
-
-    .conteudo h3{
-      margin-bottom:15px;
-      font-size:18px;
-    }
-
-    .conteudo ul{
-      padding-left:20px;
-      color:#334155;
-      line-height:1.8;
-    }
-
-    .footer{
-      margin-top:35px;
-      text-align:center;
-      color:#94a3b8;
-      font-size:13px;
-    }
-
-    @media(max-width:640px){
-
-      .container{
-        padding:25px;
-      }
-
-      .grid{
-        grid-template-columns:1fr;
-      }
-
-      h1{
-        font-size:26px;
-      }
-
-    }
-
-  </style>
-</head>
-<body>
-
-  <div class="container">
-
-    <div class="header">
-
-      <div class="icon">
-        🎓
       </div>
 
-      <h1>Verificação de Certificado</h1>
+    `;
 
-      <p class="subtitle">
-        Sistema digital de autenticação de certificados.
-      </p>
+    return;
 
-    </div>
+  }
 
-    <div id="resultado">
+  try{
 
-      <div class="loading">
-        Consultando certificado...
-      </div>
+    const response =
+      await fetch(API_URL, {
 
-    </div>
+        method: 'GET',
 
-    <div class="footer">
-      Certificação Digital • Todos os direitos reservados
-    </div>
+        headers: {
 
-  </div>
+          'X-Access-Key':
+            ACCESS_KEY,
 
-  <script>
-
-    const BIN_ID = '6a0a9e5cc0954111d83cf8b4';
-
-    async function carregarCertificado() {
-
-      const resultado = document.getElementById('resultado');
-
-      const params = new URLSearchParams(window.location.search);
-
-      const codigo = params.get('codigo');
-
-      if(!codigo){
-
-        resultado.innerHTML = `
-          <div class="card">
-
-            <div class="status-invalid">
-              ❌ Código não informado
-            </div>
-
-            <p>
-              Nenhum código de certificado foi enviado na URL.
-            </p>
-
-          </div>
-        `;
-
-        return;
-
-      }
-
-      try{
-
-        const response = await fetch(
-          `https://api.jsonbin.io/v3/b/${BIN_ID}/latest`
-        );
-
-        const data = await response.json();
-
-        const certificados = data.record;
-
-        const certificado = certificados.find(
-          item => item.codigo.toUpperCase() === codigo.toUpperCase()
-        );
-
-        if(certificado){
-
-          let conteudosHTML = '';
-
-          if(certificado.conteudo){
-
-            conteudosHTML = `
-              <div class="conteudo">
-
-                <h3>Conteúdo Programático</h3>
-
-                <ul>
-                  ${certificado.conteudo
-                    .map(item => `<li>${item}</li>`)
-                    .join('')
-                  }
-                </ul>
-
-              </div>
-            `;
-
-          }
-
-          resultado.innerHTML = `
-            <div class="card">
-
-              <div class="status-valid">
-                ✅ Certificado Autêntico
-              </div>
-
-              <div class="grid">
-
-                <div class="info">
-                  <div class="label">Código</div>
-                  <div class="value">${certificado.codigo}</div>
-                </div>
-
-                <div class="info">
-                  <div class="label">Aluno</div>
-                  <div class="value">${certificado.nome}</div>
-                </div>
-
-                <div class="info">
-                  <div class="label">CPF</div>
-                  <div class="value">${certificado.cpf}</div>
-                </div>
-
-                <div class="info">
-                  <div class="label">Curso</div>
-                  <div class="value">${certificado.curso}</div>
-                </div>
-
-                <div class="info">
-                  <div class="label">Carga Horária</div>
-                  <div class="value">
-                    ${certificado.carga_horaria} horas
-                  </div>
-                </div>
-
-                <div class="info">
-                  <div class="label">Aproveitamento</div>
-                  <div class="value">
-                    ${certificado.aproveitamento}%
-                  </div>
-                </div>
-
-                <div class="info">
-                  <div class="label">Data da Certificação</div>
-                  <div class="value">
-                    ${certificado.data_certificacao}
-                  </div>
-                </div>
-
-              </div>
-
-              ${conteudosHTML}
-
-            </div>
-          `;
-
-        } else {
-
-          resultado.innerHTML = `
-            <div class="card">
-
-              <div class="status-invalid">
-                ❌ Certificado não encontrado
-              </div>
-
-              <p>
-                O código informado não existe em nossa base de dados.
-              </p>
-
-            </div>
-          `;
+          'Content-Type':
+            'application/json'
 
         }
 
-      } catch(error){
+      });
 
-        resultado.innerHTML = `
-          <div class="card">
+    if(!response.ok){
 
-            <div class="status-invalid">
-              ⚠️ Erro de conexão
-            </div>
-
-            <p>
-              Não foi possível acessar a base de certificados.
-            </p>
-
-          </div>
-        `;
-
-        console.error(error);
-
-      }
+      throw new Error(
+        `Erro HTTP ${response.status}`
+      );
 
     }
 
-    carregarCertificado();
+    const data =
+      await response.json();
 
-  </script>
+    console.log(data);
 
-</body>
-</html>
+    const certificados =
+      data.record || [];
 
+    const certificado =
+      certificados.find(item =>
+
+        item.codigo.toUpperCase() ===
+        codigo.toUpperCase()
+
+      );
+
+    if(certificado){
+
+      resultado.innerHTML = `
+
+        <div class="card">
+
+          <div class="valid">
+            ✅ Certificado Autêntico
+          </div>
+
+          <div class="info-grid">
+
+            <div class="info">
+              <div class="info-label">
+                Nome
+              </div>
+
+              <div class="info-value">
+                ${certificado.nome}
+              </div>
+            </div>
+
+            <div class="info">
+              <div class="info-label">
+                CPF
+              </div>
+
+              <div class="info-value">
+                ${certificado.cpf}
+              </div>
+            </div>
+
+            <div class="info">
+              <div class="info-label">
+                Curso
+              </div>
+
+              <div class="info-value">
+                ${certificado.curso}
+              </div>
+            </div>
+
+            <div class="info">
+              <div class="info-label">
+                Código
+              </div>
+
+              <div class="info-value">
+                ${certificado.codigo}
+              </div>
+            </div>
+
+            <div class="info">
+              <div class="info-label">
+                Carga Horária
+              </div>
+
+              <div class="info-value">
+                ${certificado.carga_horaria}h
+              </div>
+            </div>
+
+            <div class="info">
+              <div class="info-label">
+                Aproveitamento
+              </div>
+
+              <div class="info-value">
+                ${certificado.aproveitamento}%
+              </div>
+            </div>
+
+            <div class="info">
+              <div class="info-label">
+                Data
+              </div>
+
+              <div class="info-value">
+                ${certificado.data_certificacao}
+              </div>
+            </div>
+
+          </div>
+
+        </div>
+
+      `;
+
+    } else {
+
+      resultado.innerHTML = `
+
+        <div class="card">
+
+          <div class="invalid">
+            ❌ Certificado não encontrado
+          </div>
+
+        </div>
+
+      `;
+
+    }
+
+  } catch(error){
+
+    console.error(error);
+
+    resultado.innerHTML = `
+
+      <div class="card">
+
+        <div class="invalid">
+          ⚠️ Erro ao consultar
+        </div>
+
+        <p>
+          ${error.message}
+        </p>
+
+      </div>
+
+    `;
+
+  }
+
+}
