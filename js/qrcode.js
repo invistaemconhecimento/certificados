@@ -1,7 +1,6 @@
+```javascript id="6s2m1d"
 /* ==================================================
-   QR CODE GENERATOR
-   Requer:
-   https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js
+   QR CODE SYSTEM
 ================================================== */
 
 /* =========================
@@ -9,7 +8,7 @@
 ========================= */
 
 const BASE_URL =
-  'https://teuusuario.github.io/certificados/verificar.html?codigo=';
+  'https://invistaemconhecimento.github.io/certificados/verificar.html?codigo=';
 
 /* =========================
    GERAR QR CODE
@@ -20,11 +19,19 @@ function gerarQRCode(codigo, elementoId = 'qrcode') {
   const elemento =
     document.getElementById(elementoId);
 
-  if(!elemento){
+  if (!elemento) {
 
     console.error(
       `Elemento #${elementoId} não encontrado`
     );
+
+    return;
+
+  }
+
+  if (!codigo) {
+
+    alert('Código do certificado não informado.');
 
     return;
 
@@ -43,13 +50,45 @@ function gerarQRCode(codigo, elementoId = 'qrcode') {
 
     height: 220,
 
-    colorDark : "#0f172a",
+    colorDark: '#0f172a',
 
-    colorLight : "#ffffff",
+    colorLight: '#ffffff',
 
-    correctLevel : QRCode.CorrectLevel.H
+    correctLevel: QRCode.CorrectLevel.H
 
   });
+
+}
+
+/* =========================
+   GERAR PELO INPUT
+========================= */
+
+function gerarQRCodePeloInput() {
+
+  const input =
+    document.getElementById('codigo');
+
+  if (!input) {
+
+    alert('Campo de código não encontrado.');
+
+    return;
+
+  }
+
+  const codigo =
+    input.value.trim();
+
+  if (!codigo) {
+
+    alert('Digite um código.');
+
+    return;
+
+  }
+
+  gerarQRCode(codigo);
 
 }
 
@@ -57,14 +96,21 @@ function gerarQRCode(codigo, elementoId = 'qrcode') {
    DOWNLOAD QR CODE
 ========================= */
 
-function baixarQRCode(elementoId = 'qrcode', nomeArquivo = 'qrcode-certificado') {
+function baixarQRCode(
+  elementoId = 'qrcode',
+  nomeArquivo = 'qrcode-certificado'
+) {
 
   const canvas =
-    document.querySelector(`#${elementoId} canvas`);
+    document.querySelector(
+      `#${elementoId} canvas`
+    );
 
-  if(!canvas){
+  if (!canvas) {
 
-    alert('QR Code ainda não foi gerado.');
+    alert(
+      'Nenhum QR Code foi gerado ainda.'
+    );
 
     return;
 
@@ -84,15 +130,35 @@ function baixarQRCode(elementoId = 'qrcode', nomeArquivo = 'qrcode-certificado')
 }
 
 /* =========================
-   GERAR PELO INPUT
+   GERAR AUTOMATICAMENTE
 ========================= */
 
-function gerarQRCodePeloInput(){
+function gerarQRCodeAutomatico() {
+
+  const params =
+    new URLSearchParams(window.location.search);
+
+  const codigo =
+    params.get('codigo');
+
+  if (codigo) {
+
+    gerarQRCode(codigo);
+
+  }
+
+}
+
+/* =========================
+   COPIAR LINK DE VALIDAÇÃO
+========================= */
+
+function copiarLinkValidacao() {
 
   const input =
     document.getElementById('codigo');
 
-  if(!input){
+  if (!input) {
 
     alert('Campo código não encontrado.');
 
@@ -103,7 +169,7 @@ function gerarQRCodePeloInput(){
   const codigo =
     input.value.trim();
 
-  if(!codigo){
+  if (!codigo) {
 
     alert('Digite um código.');
 
@@ -111,25 +177,49 @@ function gerarQRCodePeloInput(){
 
   }
 
-  gerarQRCode(codigo);
+  const link =
+    `${BASE_URL}${encodeURIComponent(codigo)}`;
+
+  navigator.clipboard.writeText(link);
+
+  alert(
+    'Link de validação copiado.'
+  );
 
 }
 
 /* =========================
-   GERAR AUTOMATICAMENTE
+   ABRIR VALIDAÇÃO
 ========================= */
 
-function gerarQRCodeAutomatico(){
+function abrirValidacao() {
 
-  const codigo =
-    new URLSearchParams(window.location.search)
-      .get('codigo');
+  const input =
+    document.getElementById('codigo');
 
-  if(codigo){
+  if (!input) {
 
-    gerarQRCode(codigo);
+    alert('Campo código não encontrado.');
+
+    return;
 
   }
+
+  const codigo =
+    input.value.trim();
+
+  if (!codigo) {
+
+    alert('Digite um código.');
+
+    return;
+
+  }
+
+  const url =
+    `${BASE_URL}${encodeURIComponent(codigo)}`;
+
+  window.open(url, '_blank');
 
 }
 
@@ -137,8 +227,12 @@ function gerarQRCodeAutomatico(){
    INIT
 ========================= */
 
-document.addEventListener('DOMContentLoaded', () => {
+document.addEventListener(
+  'DOMContentLoaded',
+  () => {
 
-  gerarQRCodeAutomatico();
+    gerarQRCodeAutomatico();
 
-});
+  }
+);
+```
