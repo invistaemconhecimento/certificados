@@ -1,11 +1,14 @@
+```html id="d8z3fk"
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
+
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
   <title>Painel Administrativo</title>
 
+  <!-- GOOGLE FONTS -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 
@@ -14,409 +17,239 @@
     rel="stylesheet"
   >
 
-  <style>
+  <!-- CSS -->
+  <link rel="stylesheet" href="css/style.css">
 
-    *{
-      margin:0;
-      padding:0;
-      box-sizing:border-box;
-    }
+  <!-- QR CODE LIB -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 
-    body{
-      font-family:'Inter', sans-serif;
-      background:#f1f5f9;
-      color:#0f172a;
-      padding:30px;
-    }
-
-    .container{
-      max-width:1200px;
-      margin:auto;
-    }
-
-    .header{
-      margin-bottom:30px;
-    }
-
-    h1{
-      font-size:34px;
-      margin-bottom:10px;
-    }
-
-    .subtitle{
-      color:#64748b;
-    }
-
-    .card{
-      background:#fff;
-      border-radius:24px;
-      padding:30px;
-      box-shadow:0 10px 30px rgba(0,0,0,0.05);
-      margin-bottom:30px;
-    }
-
-    .grid{
-      display:grid;
-      grid-template-columns:1fr 1fr;
-      gap:20px;
-    }
-
-    .full{
-      grid-column:1 / -1;
-    }
-
-    .field{
-      display:flex;
-      flex-direction:column;
-    }
-
-    label{
-      margin-bottom:8px;
-      font-size:14px;
-      font-weight:600;
-      color:#334155;
-    }
-
-    input,
-    textarea{
-      padding:14px;
-      border:2px solid #e2e8f0;
-      border-radius:14px;
-      font-size:15px;
-      outline:none;
-      transition:0.3s;
-      font-family:'Inter', sans-serif;
-    }
-
-    textarea{
-      resize:vertical;
-      min-height:120px;
-    }
-
-    input:focus,
-    textarea:focus{
-      border-color:#2563eb;
-    }
-
-    button{
-      border:none;
-      padding:16px 24px;
-      border-radius:14px;
-      background:#2563eb;
-      color:#fff;
-      font-size:15px;
-      font-weight:600;
-      cursor:pointer;
-      transition:0.3s;
-    }
-
-    button:hover{
-      background:#1d4ed8;
-    }
-
-    .json-output{
-      background:#0f172a;
-      color:#e2e8f0;
-      padding:25px;
-      border-radius:18px;
-      overflow:auto;
-      font-size:14px;
-      line-height:1.6;
-      margin-top:20px;
-      white-space:pre-wrap;
-      word-break:break-word;
-    }
-
-    .actions{
-      display:flex;
-      gap:15px;
-      margin-top:25px;
-      flex-wrap:wrap;
-    }
-
-    .copy-btn{
-      background:#16a34a;
-    }
-
-    .copy-btn:hover{
-      background:#15803d;
-    }
-
-    .preview{
-      margin-top:30px;
-    }
-
-    .preview-card{
-      background:#f8fafc;
-      border:1px solid #e2e8f0;
-      border-radius:18px;
-      padding:25px;
-    }
-
-    .preview-card h2{
-      margin-bottom:20px;
-      color:#2563eb;
-    }
-
-    .preview-item{
-      margin-bottom:12px;
-    }
-
-    .preview-label{
-      font-size:13px;
-      color:#64748b;
-      margin-bottom:4px;
-    }
-
-    .preview-value{
-      font-size:16px;
-      font-weight:600;
-    }
-
-    ul{
-      padding-left:20px;
-      margin-top:10px;
-      line-height:1.8;
-    }
-
-    @media(max-width:768px){
-
-      body{
-        padding:20px;
-      }
-
-      .grid{
-        grid-template-columns:1fr;
-      }
-
-      h1{
-        font-size:28px;
-      }
-
-    }
-
-  </style>
 </head>
+
 <body>
 
   <div class="container">
 
+    <!-- HEADER -->
     <div class="header">
 
       <h1>🎓 Painel Administrativo</h1>
 
       <p class="subtitle">
-        Cadastro e geração de certificados.
+        Cadastro e geração de certificados digitais.
       </p>
 
     </div>
 
+    <!-- FORM -->
     <div class="card">
 
       <div class="grid">
 
+        <!-- CÓDIGO -->
         <div class="field">
-          <label>Código do Certificado</label>
-          <input type="text" id="codigo" placeholder="CERT-001">
+
+          <label for="codigo">
+            Código do Certificado
+          </label>
+
+          <input
+            type="text"
+            id="codigo"
+            placeholder="CERT-0001"
+          >
+
         </div>
 
+        <!-- NOME -->
         <div class="field">
-          <label>Nome do Aluno</label>
-          <input type="text" id="nome" placeholder="Nome completo">
+
+          <label for="nome">
+            Nome do Aluno
+          </label>
+
+          <input
+            type="text"
+            id="nome"
+            placeholder="Nome completo"
+          >
+
         </div>
 
+        <!-- CPF -->
         <div class="field">
-          <label>CPF</label>
-          <input type="text" id="cpf" placeholder="000.000.000-00">
+
+          <label for="cpf">
+            CPF
+          </label>
+
+          <input
+            type="text"
+            id="cpf"
+            placeholder="000.000.000-00"
+          >
+
         </div>
 
+        <!-- CURSO -->
         <div class="field">
-          <label>Curso</label>
-          <input type="text" id="curso" placeholder="Nome do curso">
+
+          <label for="curso">
+            Curso
+          </label>
+
+          <input
+            type="text"
+            id="curso"
+            placeholder="Nome do curso"
+          >
+
         </div>
 
+        <!-- CARGA HORÁRIA -->
         <div class="field">
-          <label>Carga Horária</label>
-          <input type="number" id="carga" placeholder="20">
+
+          <label for="carga">
+            Carga Horária
+          </label>
+
+          <input
+            type="number"
+            id="carga"
+            placeholder="20"
+          >
+
         </div>
 
+        <!-- APROVEITAMENTO -->
         <div class="field">
-          <label>Aproveitamento (%)</label>
-          <input type="number" id="aproveitamento" placeholder="95">
+
+          <label for="aproveitamento">
+            Aproveitamento (%)
+          </label>
+
+          <input
+            type="number"
+            id="aproveitamento"
+            placeholder="95"
+          >
+
         </div>
 
+        <!-- DATA -->
+        <div class="field">
+
+          <label for="data">
+            Data da Certificação
+          </label>
+
+          <input
+            type="date"
+            id="data"
+          >
+
+        </div>
+
+        <!-- CONTEÚDO -->
         <div class="field full">
-          <label>Conteúdo Programático</label>
+
+          <label for="conteudo">
+            Conteúdo Programático
+          </label>
 
           <textarea
             id="conteudo"
             placeholder="Digite um item por linha"
           ></textarea>
-        </div>
 
-        <div class="field">
-          <label>Data da Certificação</label>
-          <input type="date" id="data">
         </div>
 
       </div>
 
+      <!-- BOTÕES -->
       <div class="actions">
 
         <button onclick="gerarJSON()">
           Gerar JSON
         </button>
 
-        <button class="copy-btn" onclick="copiarJSON()">
+        <button
+          class="copy-btn"
+          onclick="copiarJSON()"
+        >
           Copiar JSON
+        </button>
+
+        <button
+          onclick="gerarQRCodePeloInput()"
+        >
+          Gerar QR Code
+        </button>
+
+        <button
+          class="copy-btn"
+          onclick="baixarQRCode()"
+        >
+          Baixar QR Code
         </button>
 
       </div>
 
-      <div class="json-output" id="jsonOutput">
-Nenhum certificado gerado ainda.
+      <!-- JSON -->
+      <div
+        class="json-output"
+        id="jsonOutput"
+      >
+Nenhum JSON gerado ainda.
       </div>
 
     </div>
 
+    <!-- PREVIEW -->
     <div class="preview">
 
       <div class="preview-card">
 
-        <h2>Pré-visualização</h2>
+        <h2>
+          Pré-visualização
+        </h2>
 
         <div id="previewContent">
-          Preencha os dados do certificado.
+
+          <p>
+            Preencha os dados do certificado.
+          </p>
+
         </div>
 
       </div>
+
+    </div>
+
+    <!-- QR CODE -->
+    <div class="card">
+
+      <h2 style="margin-bottom:20px;">
+        QR Code do Certificado
+      </h2>
+
+      <div
+        id="qrcode"
+        style="
+          display:flex;
+          justify-content:center;
+          align-items:center;
+          min-height:240px;
+        "
+      ></div>
 
     </div>
 
   </div>
 
-  <script>
-
-    let jsonGerado = '';
-
-    function gerarJSON(){
-
-      const codigo = document.getElementById('codigo').value.trim();
-      const nome = document.getElementById('nome').value.trim();
-      const cpf = document.getElementById('cpf').value.trim();
-      const curso = document.getElementById('curso').value.trim();
-      const carga = document.getElementById('carga').value.trim();
-      const aproveitamento = document.getElementById('aproveitamento').value.trim();
-      const data = document.getElementById('data').value;
-      const conteudo = document.getElementById('conteudo')
-        .value
-        .split('\n')
-        .filter(item => item.trim() !== '');
-
-      const certificado = {
-        codigo,
-        nome,
-        cpf,
-        curso,
-        carga_horaria: Number(carga),
-        aproveitamento: Number(aproveitamento),
-        data_certificacao: formatarData(data),
-        conteudo
-      };
-
-      jsonGerado = JSON.stringify(certificado, null, 2);
-
-      document.getElementById('jsonOutput').textContent = jsonGerado;
-
-      atualizarPreview(certificado);
-
-    }
-
-    function atualizarPreview(certificado){
-
-      document.getElementById('previewContent').innerHTML = `
-
-        <div class="preview-item">
-          <div class="preview-label">Código</div>
-          <div class="preview-value">${certificado.codigo}</div>
-        </div>
-
-        <div class="preview-item">
-          <div class="preview-label">Aluno</div>
-          <div class="preview-value">${certificado.nome}</div>
-        </div>
-
-        <div class="preview-item">
-          <div class="preview-label">CPF</div>
-          <div class="preview-value">${certificado.cpf}</div>
-        </div>
-
-        <div class="preview-item">
-          <div class="preview-label">Curso</div>
-          <div class="preview-value">${certificado.curso}</div>
-        </div>
-
-        <div class="preview-item">
-          <div class="preview-label">Carga Horária</div>
-          <div class="preview-value">
-            ${certificado.carga_horaria} horas
-          </div>
-        </div>
-
-        <div class="preview-item">
-          <div class="preview-label">Aproveitamento</div>
-          <div class="preview-value">
-            ${certificado.aproveitamento}%
-          </div>
-        </div>
-
-        <div class="preview-item">
-          <div class="preview-label">Data</div>
-          <div class="preview-value">
-            ${certificado.data_certificacao}
-          </div>
-        </div>
-
-        <div class="preview-item">
-          <div class="preview-label">Conteúdo Programático</div>
-
-          <ul>
-            ${certificado.conteudo
-              .map(item => `<li>${item}</li>`)
-              .join('')
-            }
-          </ul>
-
-        </div>
-
-      `;
-
-    }
-
-    function copiarJSON(){
-
-      if(!jsonGerado){
-        alert('Gere um JSON primeiro.');
-        return;
-      }
-
-      navigator.clipboard.writeText(jsonGerado);
-
-      alert('JSON copiado com sucesso.');
-
-    }
-
-    function formatarData(dataISO){
-
-      if(!dataISO) return '';
-
-      const [ano, mes, dia] = dataISO.split('-');
-
-      return `${dia}/${mes}/${ano}`;
-
-    }
-
-  </script>
+  <!-- JS -->
+  <script src="js/app.js"></script>
+  <script src="js/qrcode.js"></script>
 
 </body>
 </html>
+```
