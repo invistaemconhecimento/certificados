@@ -1,4 +1,4 @@
-```javascript id="2r5m8k"
+
 /* =========================
    CONFIG
 ========================= */
@@ -248,4 +248,4 @@ async function carregarCertificado(){
   }
 
 }
-```
+
