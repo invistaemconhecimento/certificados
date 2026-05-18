@@ -1,126 +1,551 @@
-const API_URL = "SUA_URL_JSONBIN";
+/* =========================
+   CONFIG
+========================= */
 
-async function carregarDados() {
+const BIN_ID = '6a0a9e5cc0954111d83cf8b4';
 
-  try {
+const API_URL =
+  `https://api.jsonbin.io/v3/b/${BIN_ID}/latest`;
+
+/* =========================
+   GLOBAL
+========================= */
+
+let certificados = [];
+let jsonGerado = '';
+
+/* =========================
+   INIT
+========================= */
+
+document.addEventListener('DOMContentLoaded', () => {
+
+  carregarCertificados();
+
+  preencherCodigoAutomatico();
+
+});
+
+/* =========================
+   CARREGAR CERTIFICADOS
+========================= */
+
+async function carregarCertificados(){
+
+  try{
 
     const response = await fetch(API_URL);
 
     const data = await response.json();
 
-    return data.record || data;
+    certificados = data.record || [];
 
-  } catch (error) {
+    console.log('Certificados carregados:', certificados);
+
+  } catch(error){
+
+    console.error('Erro ao carregar certificados:', error);
+
+  }
+
+}
+
+/* =========================
+   GERAR CÓDIGO AUTOMÁTICO
+========================= */
+
+function preencherCodigoAutomatico(){
+
+  const inputCodigo =
+    document.getElementById('codigo');
+
+  if(!inputCodigo) return;
+
+  const numero = String(
+    Math.floor(Math.random() * 9999)
+  ).padStart(4, '0');
+
+  inputCodigo.value = `CERT-${numero}`;
+
+}
+
+/* =========================
+   FORMATAR DATA
+========================= */
+
+function formatarData(dataISO){
+
+  if(!dataISO) return '';
+
+  const [ano, mes, dia] = dataISO.split('-');
+
+  return `${dia}/${mes}/${ano}`;
+
+}
+
+/* =========================
+   GERAR JSON
+========================= */
+
+function gerarJSON(){
+
+  const codigo =
+    document.getElementById('codigo')
+    ?.value
+    .trim();
+
+  const nome =
+    document.getElementById('nome')
+    ?.value
+    .trim();
+
+  const cpf =
+    document.getElementById('cpf')
+    ?.value
+    .trim();
+
+  const curso =
+    document.getElementById('curso')
+    ?.value
+    .trim();
+
+  const carga =
+    document.getElementById('carga')
+    ?.value
+    .trim();
+
+  const aproveitamento =
+    document.getElementById('aproveitamento')
+    ?.value
+    .trim();
+
+  const data =
+    document.getElementById('data')
+    ?.value;
+
+  const conteudo =
+    document.getElementById('conteudo')
+    ?.value
+    .split('\n')
+    .filter(item => item.trim() !== '');
+
+  if(
+    !codigo ||
+    !nome ||
+    !cpf ||
+    !curso
+  ){
+
+    alert('Preencha os campos obrigatórios.');
+
+    return;
+
+  }
+
+  const certificado = {
+    codigo,
+    nome,
+    cpf,
+    curso,
+    carga_horaria: Number(carga),
+    aproveitamento: Number(aproveitamento),
+    data_certificacao: formatarData(data),
+    conteudo
+  };
+
+  jsonGerado =
+    JSON.stringify(certificado, null, 2);
+
+  const jsonOutput =
+    document.getElementById('jsonOutput');
+
+  if(jsonOutput){
+
+    jsonOutput.textContent = jsonGerado;
+
+  }
+
+  atualizarPreview(certificado);
+
+}
+
+/* =========================
+   PREVIEW
+========================= */
+
+function atualizarPreview(certificado){
+
+  const preview =
+    document.getElementById('previewContent');
+
+  if(!preview) return;
+
+  preview.innerHTML = `
+
+    <div class="preview-item">
+      <div class="preview-label">
+        Código
+      </div>
+
+      <div class="preview-value">
+        ${certificado.codigo}
+      </div>
+    </div>
+
+    <div class="preview-item">
+      <div class="preview-label">
+        Nome do Aluno
+      </div>
+
+      <div class="preview-value">
+        ${certificado.nome}
+      </div>
+    </div>
+
+    <div class="preview-item">
+      <div class="preview-label">
+        CPF
+      </div>
+
+      <div class="preview-value">
+        ${certificado.cpf}
+      </div>
+    </div>
+
+    <div class="preview-item">
+      <div class="preview-label">
+        Curso
+      </div>
+
+      <div class="preview-value">
+        ${certificado.curso}
+      </div>
+    </div>
+
+    <div class="preview-item">
+      <div class="preview-label">
+        Carga Horária
+      </div>
+
+      <div class="preview-value">
+        ${certificado.carga_horaria} horas
+      </div>
+    </div>
+
+    <div class="preview-item">
+      <div class="preview-label">
+        Aproveitamento
+      </div>
+
+      <div class="preview-value">
+        ${certificado.aproveitamento}%
+      </div>
+    </div>
+
+    <div class="preview-item">
+      <div class="preview-label">
+        Data da Certificação
+      </div>
+
+      <div class="preview-value">
+        ${certificado.data_certificacao}
+      </div>
+    </div>
+
+    <div class="preview-item">
+      <div class="preview-label">
+        Conteúdo Programático
+      </div>
+
+      <ul>
+        ${certificado.conteudo
+          .map(item => `<li>${item}</li>`)
+          .join('')
+        }
+      </ul>
+    </div>
+
+  `;
+
+}
+
+/* =========================
+   COPIAR JSON
+========================= */
+
+function copiarJSON(){
+
+  if(!jsonGerado){
+
+    alert('Nenhum JSON gerado.');
+
+    return;
+
+  }
+
+  navigator.clipboard.writeText(jsonGerado);
+
+  alert('JSON copiado com sucesso.');
+
+}
+
+/* =========================
+   CONSULTAR CERTIFICADO
+========================= */
+
+async function verificarCertificado(){
+
+  const codigo =
+    document.getElementById('codigo')
+    ?.value
+    .trim();
+
+  const result =
+    document.getElementById('result');
+
+  const loading =
+    document.getElementById('loading');
+
+  if(!codigo){
+
+    alert('Digite um código.');
+
+    return;
+
+  }
+
+  if(loading){
+
+    loading.style.display = 'block';
+
+  }
+
+  if(result){
+
+    result.style.display = 'none';
+
+  }
+
+  try{
+
+    const response = await fetch(API_URL);
+
+    const data = await response.json();
+
+    const lista = data.record || [];
+
+    const certificado = lista.find(
+      item =>
+        item.codigo.toUpperCase() ===
+        codigo.toUpperCase()
+    );
+
+    if(loading){
+
+      loading.style.display = 'none';
+
+    }
+
+    if(certificado){
+
+      renderizarCertificado(certificado);
+
+    } else {
+
+      renderizarNaoEncontrado();
+
+    }
+
+  } catch(error){
 
     console.error(error);
 
-    return [];
+    if(loading){
+
+      loading.style.display = 'none';
+
+    }
+
+    renderizarErro();
 
   }
 
 }
 
-function mascararCPF(cpf){
+/* =========================
+   RENDER VALID
+========================= */
 
-  return "***." + cpf.slice(4);
+function renderizarCertificado(certificado){
 
-}
+  const result =
+    document.getElementById('result');
 
-async function buscarCertificado() {
+  if(!result) return;
 
-  const codigo = document
-    .getElementById("codigoInput")
-    .value
-    .trim();
+  result.innerHTML = `
 
-  const resultado = document.getElementById("resultado");
+    <div class="card">
 
-  resultado.innerHTML = "Carregando...";
+      <div class="valid">
+        ✅ Certificado válido
+      </div>
 
-  const certificados = await carregarDados();
+      <div class="info-grid">
 
-  const cert = certificados.find(c => c.codigo === codigo);
+        <div class="info">
+          <div class="info-label">
+            Código
+          </div>
 
-  if(cert){
-
-    resultado.innerHTML = `
-      <div class="resultado">
-
-        <div class="sucesso">
-          ✅ Certificado Válido
+          <div class="info-value">
+            ${certificado.codigo}
+          </div>
         </div>
 
         <div class="info">
-          <span class="label">Aluno:</span>
-          ${cert.nome}
+          <div class="info-label">
+            Aluno
+          </div>
+
+          <div class="info-value">
+            ${certificado.nome}
+          </div>
         </div>
 
         <div class="info">
-          <span class="label">CPF:</span>
-          ${mascararCPF(cert.cpf)}
+          <div class="info-label">
+            CPF
+          </div>
+
+          <div class="info-value">
+            ${certificado.cpf}
+          </div>
         </div>
 
         <div class="info">
-          <span class="label">Curso:</span>
-          ${cert.curso}
+          <div class="info-label">
+            Curso
+          </div>
+
+          <div class="info-value">
+            ${certificado.curso}
+          </div>
         </div>
 
         <div class="info">
-          <span class="label">Carga Horária:</span>
-          ${cert.carga_horaria} horas
+          <div class="info-label">
+            Carga Horária
+          </div>
+
+          <div class="info-value">
+            ${certificado.carga_horaria}h
+          </div>
         </div>
 
         <div class="info">
-          <span class="label">Aproveitamento:</span>
-          ${cert.aproveitamento}%
+          <div class="info-label">
+            Aproveitamento
+          </div>
+
+          <div class="info-value">
+            ${certificado.aproveitamento}%
+          </div>
         </div>
 
         <div class="info">
-          <span class="label">Data da Certificação:</span>
-          ${cert.data_certificacao}
-        </div>
+          <div class="info-label">
+            Data da Certificação
+          </div>
 
-        <div class="info">
-          <span class="label">Conteúdo Programático:</span>
-
-          <ul>
-            ${cert.conteudo.map(item => `<li>${item}</li>`).join("")}
-          </ul>
-
-        </div>
-
-        <div class="codigo">
-          Código de Verificação:
-          ${cert.codigo}
+          <div class="info-value">
+            ${certificado.data_certificacao}
+          </div>
         </div>
 
       </div>
-    `;
 
-  } else {
+      <div class="preview-item">
 
-    resultado.innerHTML = `
-      <div class="erro">
+        <div class="preview-label">
+          Conteúdo Programático
+        </div>
+
+        <ul>
+          ${certificado.conteudo
+            .map(item => `<li>${item}</li>`)
+            .join('')
+          }
+        </ul>
+
+      </div>
+
+    </div>
+
+  `;
+
+  result.style.display = 'block';
+
+}
+
+/* =========================
+   NOT FOUND
+========================= */
+
+function renderizarNaoEncontrado(){
+
+  const result =
+    document.getElementById('result');
+
+  if(!result) return;
+
+  result.innerHTML = `
+
+    <div class="card">
+
+      <div class="invalid">
         ❌ Certificado não encontrado
       </div>
-    `;
 
-  }
+      <p>
+        O código informado não existe.
+      </p>
+
+    </div>
+
+  `;
+
+  result.style.display = 'block';
 
 }
 
-window.onload = async () => {
+/* =========================
+   ERROR
+========================= */
 
-  const params = new URLSearchParams(window.location.search);
+function renderizarErro(){
 
-  const codigo = params.get("codigo");
+  const result =
+    document.getElementById('result');
 
-  if(codigo){
+  if(!result) return;
 
-    document.getElementById("codigoInput").value = codigo;
+  result.innerHTML = `
 
-    buscarCertificado();
+    <div class="card">
 
-  }
+      <div class="invalid">
+        ⚠️ Erro ao consultar
+      </div>
 
-};
+      <p>
+        Não foi possível acessar o servidor.
+      </p>
+
+    </div>
+
+  `;
+
+  result.style.display = 'block';
+
+}
