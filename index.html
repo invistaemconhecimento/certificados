@@ -1,33 +1,338 @@
+```html
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Validação de Certificado</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 
-  <link rel="stylesheet" href="style.css">
+  <title>Validação de Certificados</title>
 
+  <link
+    href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap"
+    rel="stylesheet"
+  >
+
+  <style>
+    *{
+      margin:0;
+      padding:0;
+      box-sizing:border-box;
+    }
+
+    body{
+      font-family:'Inter', sans-serif;
+      background:#f4f7fb;
+      min-height:100vh;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      padding:20px;
+      color:#1e293b;
+    }
+
+    .container{
+      width:100%;
+      max-width:600px;
+      background:#fff;
+      border-radius:24px;
+      padding:40px;
+      box-shadow:0 10px 40px rgba(0,0,0,0.08);
+    }
+
+    .logo{
+      width:90px;
+      height:90px;
+      margin:0 auto 20px;
+      border-radius:20px;
+      background:#2563eb;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      color:#fff;
+      font-size:40px;
+      font-weight:700;
+    }
+
+    h1{
+      text-align:center;
+      font-size:32px;
+      margin-bottom:10px;
+    }
+
+    .subtitle{
+      text-align:center;
+      color:#64748b;
+      margin-bottom:35px;
+      line-height:1.5;
+    }
+
+    .search-box{
+      display:flex;
+      flex-direction:column;
+      gap:15px;
+    }
+
+    input{
+      width:100%;
+      padding:16px;
+      border:2px solid #e2e8f0;
+      border-radius:14px;
+      font-size:16px;
+      transition:0.3s;
+      outline:none;
+    }
+
+    input:focus{
+      border-color:#2563eb;
+    }
+
+    button{
+      padding:16px;
+      border:none;
+      border-radius:14px;
+      background:#2563eb;
+      color:#fff;
+      font-size:16px;
+      font-weight:600;
+      cursor:pointer;
+      transition:0.3s;
+    }
+
+    button:hover{
+      background:#1d4ed8;
+    }
+
+    .result{
+      margin-top:30px;
+      display:none;
+    }
+
+    .card{
+      background:#f8fafc;
+      border-radius:18px;
+      padding:25px;
+      border:1px solid #e2e8f0;
+    }
+
+    .valid{
+      color:#16a34a;
+      font-size:20px;
+      font-weight:700;
+      margin-bottom:20px;
+    }
+
+    .invalid{
+      color:#dc2626;
+      font-size:20px;
+      font-weight:700;
+      margin-bottom:20px;
+    }
+
+    .info{
+      margin-bottom:14px;
+    }
+
+    .label{
+      font-size:13px;
+      color:#64748b;
+      margin-bottom:4px;
+    }
+
+    .value{
+      font-size:17px;
+      font-weight:600;
+    }
+
+    .footer{
+      margin-top:30px;
+      text-align:center;
+      font-size:13px;
+      color:#94a3b8;
+    }
+
+    .loading{
+      text-align:center;
+      margin-top:20px;
+      color:#64748b;
+      display:none;
+    }
+
+    @media(max-width:640px){
+
+      .container{
+        padding:25px;
+      }
+
+      h1{
+        font-size:26px;
+      }
+
+    }
+  </style>
 </head>
 <body>
 
   <div class="container">
 
-    <div class="card">
+    <div class="logo">
+      🎓
+    </div>
 
-      <h1>🎓 Validação de Certificado</h1>
+    <h1>Validar Certificado</h1>
 
-      <div class="busca">
-        <input type="text" id="codigoInput" placeholder="Digite o código do certificado">
-        <button onclick="buscarCertificado()">Validar</button>
-      </div>
+    <p class="subtitle">
+      Consulte a autenticidade de certificados emitidos pela escola de treinamentos.
+    </p>
 
-      <div id="resultado"></div>
+    <div class="search-box">
 
+      <input
+        type="text"
+        id="codigo"
+        placeholder="Digite o código do certificado"
+      >
+
+      <button onclick="verificarCertificado()">
+        Verificar Certificado
+      </button>
+
+    </div>
+
+    <div class="loading" id="loading">
+      Consultando certificado...
+    </div>
+
+    <div class="result" id="result"></div>
+
+    <div class="footer">
+      Sistema de Certificação Digital
     </div>
 
   </div>
 
-  <script src="app.js"></script>
+  <script>
+
+    const BIN_ID = '6a0a9e5cc0954111d83cf8b4';
+
+    async function verificarCertificado() {
+
+      const codigo = document
+        .getElementById('codigo')
+        .value
+        .trim();
+
+      const result = document.getElementById('result');
+      const loading = document.getElementById('loading');
+
+      result.style.display = 'none';
+      loading.style.display = 'block';
+
+      try {
+
+        const response = await fetch(
+          `https://api.jsonbin.io/v3/b/${BIN_ID}/latest`
+        );
+
+        const data = await response.json();
+
+        const certificados = data.record;
+
+        const certificado = certificados.find(
+          item => item.codigo.toUpperCase() === codigo.toUpperCase()
+        );
+
+        loading.style.display = 'none';
+
+        if(certificado){
+
+          result.innerHTML = `
+            <div class="card">
+
+              <div class="valid">
+                ✅ Certificado válido
+              </div>
+
+              <div class="info">
+                <div class="label">Aluno</div>
+                <div class="value">${certificado.nome}</div>
+              </div>
+
+              <div class="info">
+                <div class="label">CPF</div>
+                <div class="value">${certificado.cpf}</div>
+              </div>
+
+              <div class="info">
+                <div class="label">Curso</div>
+                <div class="value">${certificado.curso}</div>
+              </div>
+
+              <div class="info">
+                <div class="label">Carga Horária</div>
+                <div class="value">${certificado.carga_horaria} horas</div>
+              </div>
+
+              <div class="info">
+                <div class="label">Aproveitamento</div>
+                <div class="value">${certificado.aproveitamento}%</div>
+              </div>
+
+              <div class="info">
+                <div class="label">Data da Certificação</div>
+                <div class="value">${certificado.data_certificacao}</div>
+              </div>
+
+            </div>
+          `;
+
+        } else {
+
+          result.innerHTML = `
+            <div class="card">
+
+              <div class="invalid">
+                ❌ Certificado não encontrado
+              </div>
+
+              <p>
+                O código informado não existe em nossa base de dados.
+              </p>
+
+            </div>
+          `;
+
+        }
+
+        result.style.display = 'block';
+
+      } catch(error){
+
+        loading.style.display = 'none';
+
+        result.innerHTML = `
+          <div class="card">
+
+            <div class="invalid">
+              ⚠️ Erro ao consultar
+            </div>
+
+            <p>
+              Não foi possível acessar a base de certificados.
+            </p>
+
+          </div>
+        `;
+
+        result.style.display = 'block';
+
+        console.error(error);
+
+      }
+
+    }
+
+  </script>
 
 </body>
 </html>
+```
