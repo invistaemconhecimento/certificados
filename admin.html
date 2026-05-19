@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
+
 <head>
 
   <meta charset="UTF-8">
@@ -12,6 +13,22 @@
   <title>
     Painel Administrativo
   </title>
+
+  <link
+    rel="preconnect"
+    href="https://fonts.googleapis.com"
+  >
+
+  <link
+    rel="preconnect"
+    href="https://fonts.gstatic.com"
+    crossorigin
+  >
+
+  <link
+    href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap"
+    rel="stylesheet"
+  >
 
   <link
     rel="stylesheet"
@@ -33,10 +50,14 @@
       </h1>
 
       <p class="subtitle">
-        Cadastro e geração de certificados
+        Cadastro e gerenciamento de certificados
       </p>
 
     </div>
+
+    <!-- =========================
+         FORMULÁRIO
+    ========================== -->
 
     <div class="card">
 
@@ -65,6 +86,7 @@
           <input
             type="text"
             id="nome"
+            placeholder="Digite o nome"
           >
 
         </div>
@@ -78,6 +100,7 @@
           <input
             type="text"
             id="cpf"
+            placeholder="00000000000"
           >
 
         </div>
@@ -91,6 +114,7 @@
           <input
             type="text"
             id="curso"
+            placeholder="Nome do curso"
           >
 
         </div>
@@ -104,6 +128,7 @@
           <input
             type="number"
             id="carga"
+            placeholder="40"
           >
 
         </div>
@@ -117,6 +142,7 @@
           <input
             type="number"
             id="aproveitamento"
+            placeholder="100"
           >
 
         </div>
@@ -143,12 +169,16 @@
           <textarea
             id="conteudo"
             rows="10"
-            placeholder="Um conteúdo por linha"
+            placeholder="Digite um conteúdo por linha"
           ></textarea>
 
         </div>
 
       </div>
+
+      <!-- =========================
+           BOTÕES
+      ========================== -->
 
       <div class="actions">
 
@@ -162,8 +192,16 @@
         <button
           type="button"
           onclick="copiarJSON()"
+          class="copy-btn"
         >
           Copiar JSON
+        </button>
+
+        <button
+          type="button"
+          onclick="salvarCertificado()"
+        >
+          Salvar Certificado
         </button>
 
         <button
@@ -171,6 +209,13 @@
           onclick="gerarQRCodePeloInput()"
         >
           Gerar QR Code
+        </button>
+
+        <button
+          type="button"
+          onclick="copiarLinkValidacao()"
+        >
+          Copiar Link
         </button>
 
         <button
@@ -184,15 +229,26 @@
 
     </div>
 
+    <!-- =========================
+         JSON GERADO
+    ========================== -->
+
     <div class="card">
 
       <h2>
         JSON Gerado
       </h2>
 
-      <pre id="jsonOutput"></pre>
+      <pre
+        id="jsonOutput"
+        class="json-output"
+      ></pre>
 
     </div>
+
+    <!-- =========================
+         QR CODE
+    ========================== -->
 
     <div class="card">
 
@@ -204,6 +260,10 @@
 
     </div>
 
+    <!-- =========================
+         PREVIEW
+    ========================== -->
+
     <div class="card">
 
       <h2>
@@ -214,10 +274,49 @@
 
     </div>
 
+    <!-- =========================
+         LISTA DE CERTIFICADOS
+    ========================== -->
+
+    <div class="card">
+
+      <h2>
+        Certificados Cadastrados
+      </h2>
+
+      <div
+        id="listaCertificados"
+        class="table-container"
+      >
+
+        <div class="loading">
+          Carregando certificados...
+        </div>
+
+      </div>
+
+    </div>
+
+    <!-- =========================
+         FOOTER
+    ========================== -->
+
+    <div class="footer">
+
+      Sistema de Certificados Online
+
+    </div>
+
   </div>
 
+  <!-- =========================
+       SCRIPTS
+  ========================== -->
+
   <script src="js/app.js"></script>
+
   <script src="js/qrcode.js"></script>
 
 </body>
+
 </html>
