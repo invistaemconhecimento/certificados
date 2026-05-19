@@ -1,3 +1,4 @@
+
 const BIN_ID =
   '6a0a9e5cc0954111d83cf8b4';
 
@@ -10,13 +11,17 @@ const API_URL =
 let certificados = [];
 let jsonGerado = '';
 
+/* =========================
+   INIT
+========================= */
+
 document.addEventListener('DOMContentLoaded', () => {
   carregarCertificados();
   preencherCodigoAutomatico();
 });
 
 /* =========================
-   BUSCAR DADOS
+   BUSCAR DADOS (ROBUSTO)
 ========================= */
 
 async function buscarDados(){
@@ -35,13 +40,22 @@ async function buscarDados(){
 
   const data = await response.json();
 
-  console.log('JSONBin:', data);
+  console.log('JSONBin RAW:', data);
 
-  return data.record?.certificados || [];
+  const record = data.record;
+
+  // 🔥 NORMALIZA QUALQUER FORMATO POSSÍVEL
+  if(!record) return [];
+
+  if(Array.isArray(record)) return record;
+
+  if(Array.isArray(record.certificados)) return record.certificados;
+
+  return [];
 }
 
 /* =========================
-   CARREGAR
+   CARREGAR LISTA
 ========================= */
 
 async function carregarCertificados(){
@@ -52,7 +66,7 @@ async function carregarCertificados(){
     renderizarListaCertificados();
 
   }catch(err){
-    console.error(err);
+    console.error('Erro carregar:', err);
   }
 }
 
@@ -66,11 +80,11 @@ function preencherCodigoAutomatico(){
   if(!input) return;
 
   input.value =
-    `CERT-${Date.now()}-${Math.floor(Math.random()*1000)}`;
+    `CERT-${Date.now()}-${Math.floor(Math.random()*999)}`;
 }
 
 /* =========================
-   FORM DATA
+   OBTER FORMULÁRIO
 ========================= */
 
 function obterDadosFormulario(){
@@ -97,8 +111,8 @@ function obterDadosFormulario(){
     nome,
     cpf,
     curso,
-    carga_horaria: Number(carga),
-    aproveitamento: Number(aproveitamento),
+    carga_horaria: Number(carga || 0),
+    aproveitamento: Number(aproveitamento || 0),
     data_certificacao: formatarData(data),
     conteudo
   };
@@ -113,11 +127,12 @@ function formatarData(data){
   if(!data) return '';
 
   const [y,m,d] = data.split('-');
+
   return `${d}/${m}/${y}`;
 }
 
 /* =========================
-   SALVAR CERTIFICADO
+   SALVAR CERTIFICADO (CORRIGIDO)
 ========================= */
 
 async function salvarCertificado(){
@@ -129,8 +144,12 @@ async function salvarCertificado(){
 
     const lista = await buscarDados();
 
+    if(!Array.isArray(lista)){
+      throw new Error('Formato inválido no banco');
+    }
+
     const existe = lista.some(c =>
-      c.codigo.toUpperCase() === novo.codigo.toUpperCase()
+      c.codigo?.toUpperCase() === novo.codigo.toUpperCase()
     );
 
     if(existe){
@@ -156,6 +175,10 @@ async function salvarCertificado(){
       }
     );
 
+    const text = await response.text();
+
+    console.log('PUT RESPONSE:', text);
+
     if(!response.ok){
       throw new Error(`Erro HTTP ${response.status}`);
     }
@@ -166,7 +189,9 @@ async function salvarCertificado(){
     carregarCertificados();
 
   }catch(err){
-    console.error(err);
+
+    console.error('ERRO SALVAR:', err);
+
     alert('Erro ao salvar certificado');
   }
 }
@@ -181,11 +206,13 @@ function limparFormulario(){
     if(i.type !== 'button') i.value = '';
   });
 
+  jsonGerado = '';
+
   preencherCodigoAutomatico();
 }
 
 /* =========================
-   LISTA
+   LISTAR
 ========================= */
 
 function renderizarListaCertificados(){
@@ -194,7 +221,7 @@ function renderizarListaCertificados(){
   if(!el) return;
 
   if(certificados.length === 0){
-    el.innerHTML = '<p>Nenhum certificado</p>';
+    el.innerHTML = '<p>Nenhum certificado encontrado</p>';
     return;
   }
 
@@ -211,10 +238,10 @@ function renderizarListaCertificados(){
       <tbody>
         ${certificados.map(c=>`
           <tr>
-            <td>${c.codigo}</td>
-            <td>${c.nome}</td>
-            <td>${c.curso}</td>
-            <td>${c.data_certificacao}</td>
+            <td>${c.codigo || ''}</td>
+            <td>${c.nome || ''}</td>
+            <td>${c.curso || ''}</td>
+            <td>${c.data_certificacao || ''}</td>
           </tr>
         `).join('')}
       </tbody>
@@ -236,27 +263,40 @@ async function verificarCertificado(){
     return;
   }
 
-  const lista = await buscarDados();
+  try{
 
-  const cert = lista.find(c =>
-    c.codigo.toUpperCase() === codigo.toUpperCase()
-  );
+    const lista = await buscarDados();
 
-  if(cert){
+    const cert = lista.find(c =>
+      c.codigo?.toUpperCase() === codigo.toUpperCase()
+    );
+
+    if(cert){
+
+      result.innerHTML = `
+        <div class="card">
+          <h3>✅ Certificado válido</h3>
+          <p><b>${cert.nome}</b></p>
+          <p>${cert.curso}</p>
+        </div>
+      `;
+
+    } else {
+
+      result.innerHTML = `
+        <div class="card">
+          <h3>❌ Não encontrado</h3>
+        </div>
+      `;
+    }
+
+  }catch(err){
+
+    console.error(err);
 
     result.innerHTML = `
       <div class="card">
-        <h3>✅ Válido</h3>
-        <p>${cert.nome}</p>
-        <p>${cert.curso}</p>
-      </div>
-    `;
-
-  }else{
-
-    result.innerHTML = `
-      <div class="card">
-        <h3>❌ Não encontrado</h3>
+        <h3>⚠️ Erro ao consultar</h3>
       </div>
     `;
   }
