@@ -35,7 +35,7 @@ document.addEventListener(
 );
 
 /* ==================================================
-   FETCH DADOS
+   BUSCAR DADOS JSONBIN
 ================================================== */
 
 async function buscarDados(){
@@ -51,10 +51,7 @@ async function buscarDados(){
           'application/json',
 
         'X-Access-Key':
-          ACCESS_KEY,
-
-        'X-Bin-Meta':
-          'false'
+          ACCESS_KEY
 
       }
 
@@ -68,7 +65,15 @@ async function buscarDados(){
 
   }
 
-  return await response.json();
+  const data =
+    await response.json();
+
+  console.log(
+    'Dados JSONBin:',
+    data
+  );
+
+  return data.record || [];
 
 }
 
@@ -102,21 +107,20 @@ async function carregarCertificados(){
 }
 
 /* ==================================================
-   GERAR CÓDIGO
+   GERAR CÓDIGO AUTOMÁTICO
 ================================================== */
 
 function preencherCodigoAutomatico(){
 
-  const inputCodigo =
+  const input =
     document.getElementById('codigo');
 
-  if(!inputCodigo) return;
+  if(!input) return;
 
   const codigo =
     `CERT-${Date.now()}-${Math.floor(Math.random() * 1000)}`;
 
-  inputCodigo.value =
-    codigo;
+  input.value = codigo;
 
 }
 
@@ -128,26 +132,21 @@ function formatarData(dataISO){
 
   if(!dataISO) return '';
 
-  const [
-    ano,
-    mes,
-    dia
-  ] = dataISO.split('-');
+  const [ano, mes, dia] = dataISO.split('-');
 
   return `${dia}/${mes}/${ano}`;
 
 }
 
 /* ==================================================
-   ESCAPE HTML
+   ESCAPE HTML (SEGURANÇA)
 ================================================== */
 
 function escapeHTML(texto){
 
   if(!texto) return '';
 
-  const div =
-    document.createElement('div');
+  const div = document.createElement('div');
 
   div.innerText = texto;
 
@@ -163,14 +162,9 @@ function mascararCPF(cpf){
 
   if(!cpf) return '';
 
-  cpf =
-    cpf.replace(/\D/g, '');
+  cpf = cpf.replace(/\D/g, '');
 
-  if(cpf.length !== 11){
-
-    return cpf;
-
-  }
+  if(cpf.length !== 11) return cpf;
 
   return cpf.replace(
     /^(\d{3})\d{3}\d{3}(\d{2})$/,
@@ -180,63 +174,40 @@ function mascararCPF(cpf){
 }
 
 /* ==================================================
-   OBTER DADOS FORM
+   OBTER DADOS DO FORM
 ================================================== */
 
 function obterDadosFormulario(){
 
   const codigo =
-    document.getElementById('codigo')
-    ?.value
-    .trim();
+    document.getElementById('codigo')?.value.trim();
 
   const nome =
-    document.getElementById('nome')
-    ?.value
-    .trim();
+    document.getElementById('nome')?.value.trim();
 
   const cpf =
-    document.getElementById('cpf')
-    ?.value
-    .trim();
+    document.getElementById('cpf')?.value.trim();
 
   const curso =
-    document.getElementById('curso')
-    ?.value
-    .trim();
+    document.getElementById('curso')?.value.trim();
 
   const carga =
-    document.getElementById('carga')
-    ?.value
-    .trim();
+    document.getElementById('carga')?.value.trim();
 
   const aproveitamento =
-    document.getElementById('aproveitamento')
-    ?.value
-    .trim();
+    document.getElementById('aproveitamento')?.value.trim();
 
   const data =
-    document.getElementById('data')
-    ?.value;
+    document.getElementById('data')?.value;
 
   const conteudo =
-    document.getElementById('conteudo')
-    ?.value
-    .split('\n')
-    .filter(
-      item => item.trim() !== ''
-    );
+    document.getElementById('conteudo')?.value
+      .split('\n')
+      .filter(i => i.trim() !== '');
 
-  if(
-    !codigo ||
-    !nome ||
-    !cpf ||
-    !curso
-  ){
+  if(!codigo || !nome || !cpf || !curso){
 
-    alert(
-      'Preencha os campos obrigatórios.'
-    );
+    alert('Preencha os campos obrigatórios.');
 
     return null;
 
@@ -245,22 +216,12 @@ function obterDadosFormulario(){
   return {
 
     codigo,
-
     nome,
-
     cpf,
-
     curso,
-
-    carga_horaria:
-      Number(carga),
-
-    aproveitamento:
-      Number(aproveitamento),
-
-    data_certificacao:
-      formatarData(data),
-
+    carga_horaria: Number(carga),
+    aproveitamento: Number(aproveitamento),
+    data_certificacao: formatarData(data),
     conteudo
 
   };
@@ -279,23 +240,10 @@ function gerarJSON(){
   if(!certificado) return;
 
   jsonGerado =
-    JSON.stringify(
-      certificado,
-      null,
-      2
-    );
+    JSON.stringify(certificado, null, 2);
 
-  const jsonOutput =
-    document.getElementById(
-      'jsonOutput'
-    );
-
-  if(jsonOutput){
-
-    jsonOutput.textContent =
-      jsonGerado;
-
-  }
+  document.getElementById('jsonOutput')
+    .textContent = jsonGerado;
 
   atualizarPreview(certificado);
 
@@ -308,116 +256,45 @@ function gerarJSON(){
 function atualizarPreview(certificado){
 
   const preview =
-    document.getElementById(
-      'previewContent'
-    );
+    document.getElementById('previewContent');
 
   if(!preview) return;
 
   preview.innerHTML = `
 
     <div class="preview-item">
-
-      <div class="preview-label">
-        Código
-      </div>
-
-      <div class="preview-value">
-        ${escapeHTML(certificado.codigo)}
-      </div>
-
+      <div class="preview-label">Código</div>
+      <div class="preview-value">${escapeHTML(certificado.codigo)}</div>
     </div>
 
     <div class="preview-item">
-
-      <div class="preview-label">
-        Nome do Aluno
-      </div>
-
-      <div class="preview-value">
-        ${escapeHTML(certificado.nome)}
-      </div>
-
+      <div class="preview-label">Nome</div>
+      <div class="preview-value">${escapeHTML(certificado.nome)}</div>
     </div>
 
     <div class="preview-item">
-
-      <div class="preview-label">
-        CPF
-      </div>
-
-      <div class="preview-value">
-        ${mascararCPF(certificado.cpf)}
-      </div>
-
+      <div class="preview-label">CPF</div>
+      <div class="preview-value">${mascararCPF(certificado.cpf)}</div>
     </div>
 
     <div class="preview-item">
-
-      <div class="preview-label">
-        Curso
-      </div>
-
-      <div class="preview-value">
-        ${escapeHTML(certificado.curso)}
-      </div>
-
+      <div class="preview-label">Curso</div>
+      <div class="preview-value">${escapeHTML(certificado.curso)}</div>
     </div>
 
     <div class="preview-item">
-
-      <div class="preview-label">
-        Carga Horária
-      </div>
-
-      <div class="preview-value">
-        ${certificado.carga_horaria} horas
-      </div>
-
+      <div class="preview-label">Carga Horária</div>
+      <div class="preview-value">${certificado.carga_horaria}h</div>
     </div>
 
     <div class="preview-item">
-
-      <div class="preview-label">
-        Aproveitamento
-      </div>
-
-      <div class="preview-value">
-        ${certificado.aproveitamento}%
-      </div>
-
+      <div class="preview-label">Aproveitamento</div>
+      <div class="preview-value">${certificado.aproveitamento}%</div>
     </div>
 
     <div class="preview-item">
-
-      <div class="preview-label">
-        Data da Certificação
-      </div>
-
-      <div class="preview-value">
-        ${escapeHTML(certificado.data_certificacao)}
-      </div>
-
-    </div>
-
-    <div class="preview-item">
-
-      <div class="preview-label">
-        Conteúdo Programático
-      </div>
-
-      <ul>
-
-        ${certificado.conteudo
-          .map(
-            item =>
-              `<li>${escapeHTML(item)}</li>`
-          )
-          .join('')
-        }
-
-      </ul>
-
+      <div class="preview-label">Data</div>
+      <div class="preview-value">${escapeHTML(certificado.data_certificacao)}</div>
     </div>
 
   `;
@@ -431,27 +308,18 @@ function atualizarPreview(certificado){
 function copiarJSON(){
 
   if(!jsonGerado){
-
-    alert(
-      'Nenhum JSON gerado.'
-    );
-
+    alert('Nenhum JSON gerado.');
     return;
-
   }
 
-  navigator.clipboard.writeText(
-    jsonGerado
-  );
+  navigator.clipboard.writeText(jsonGerado);
 
-  alert(
-    'JSON copiado com sucesso.'
-  );
+  alert('JSON copiado com sucesso.');
 
 }
 
 /* ==================================================
-   SALVAR CERTIFICADO
+   SALVAR CERTIFICADO NO JSONBIN
 ================================================== */
 
 async function salvarCertificado(){
@@ -466,65 +334,40 @@ async function salvarCertificado(){
     const listaAtual =
       await buscarDados();
 
+    if(!Array.isArray(listaAtual)){
+      throw new Error('Formato inválido no JSONBin.');
+    }
+
     const existe =
       listaAtual.some(item =>
-
-        item.codigo.toUpperCase() ===
-        certificado.codigo.toUpperCase()
-
+        item.codigo.toUpperCase() === certificado.codigo.toUpperCase()
       );
 
     if(existe){
-
-      alert(
-        'Já existe certificado com esse código.'
-      );
-
+      alert('Já existe certificado com esse código.');
       return;
-
     }
 
-    listaAtual.push(
-      certificado
-    );
+    listaAtual.push(certificado);
 
     const response =
       await fetch(
-
         `https://api.jsonbin.io/v3/b/${BIN_ID}`,
-
         {
-
           method: 'PUT',
-
           headers: {
-
-            'Content-Type':
-              'application/json',
-
-            'X-Access-Key':
-              ACCESS_KEY
-
+            'Content-Type': 'application/json',
+            'X-Access-Key': ACCESS_KEY
           },
-
-          body:
-            JSON.stringify(listaAtual)
-
+          body: JSON.stringify(listaAtual)
         }
-
       );
 
     if(!response.ok){
-
-      throw new Error(
-        `Erro HTTP ${response.status}`
-      );
-
+      throw new Error(`Erro HTTP ${response.status}`);
     }
 
-    alert(
-      'Certificado salvo com sucesso.'
-    );
+    alert('Certificado salvo com sucesso!');
 
     limparFormulario();
 
@@ -534,9 +377,7 @@ async function salvarCertificado(){
 
     console.error(error);
 
-    alert(
-      'Erro ao salvar certificado.'
-    );
+    alert('Erro ao salvar certificado.');
 
   }
 
@@ -548,352 +389,24 @@ async function salvarCertificado(){
 
 function limparFormulario(){
 
-  document
-    .querySelectorAll(
-      'input, textarea'
-    )
-    .forEach(campo => {
+  document.querySelectorAll('input, textarea')
+    .forEach(c => {
 
-      if(
-        campo.type !== 'button'
-      ){
-
-        campo.value = '';
-
+      if(c.type !== 'button'){
+        c.value = '';
       }
 
     });
 
-  const jsonOutput =
-    document.getElementById(
-      'jsonOutput'
-    );
+  jsonGerado = '';
 
-  if(jsonOutput){
+  document.getElementById('jsonOutput').textContent = '';
 
-    jsonOutput.textContent = '';
+  document.getElementById('previewContent').innerHTML = '';
 
-  }
-
-  const preview =
-    document.getElementById(
-      'previewContent'
-    );
-
-  if(preview){
-
-    preview.innerHTML = '';
-
-  }
-
-  const qrcode =
-    document.getElementById(
-      'qrcode'
-    );
-
-  if(qrcode){
-
-    qrcode.innerHTML = '';
-
-  }
+  document.getElementById('qrcode').innerHTML = '';
 
   preencherCodigoAutomatico();
-
-}
-
-/* ==================================================
-   VERIFICAR CERTIFICADO
-================================================== */
-
-async function verificarCertificado(){
-
-  const codigo =
-    document.getElementById('codigo')
-    ?.value
-    .trim();
-
-  const result =
-    document.getElementById('result');
-
-  const loading =
-    document.getElementById('loading');
-
-  if(!codigo){
-
-    alert('Digite um código.');
-
-    return;
-
-  }
-
-  if(loading){
-
-    loading.style.display =
-      'block';
-
-  }
-
-  if(result){
-
-    result.style.display =
-      'none';
-
-  }
-
-  try{
-
-    const lista =
-      await buscarDados();
-
-    const certificado =
-      lista.find(item =>
-
-        item.codigo.toUpperCase() ===
-        codigo.toUpperCase()
-
-      );
-
-    if(loading){
-
-      loading.style.display =
-        'none';
-
-    }
-
-    if(certificado){
-
-      renderizarCertificado(
-        certificado
-      );
-
-    } else {
-
-      renderizarNaoEncontrado();
-
-    }
-
-  } catch(error){
-
-    console.error(error);
-
-    if(loading){
-
-      loading.style.display =
-        'none';
-
-    }
-
-    renderizarErro();
-
-  }
-
-}
-
-/* ==================================================
-   RENDER CERTIFICADO
-================================================== */
-
-function renderizarCertificado(
-  certificado
-){
-
-  const result =
-    document.getElementById(
-      'result'
-    );
-
-  if(!result) return;
-
-  result.innerHTML = `
-
-    <div class="card">
-
-      <div class="valid">
-        ✅ Certificado válido
-      </div>
-
-      <div class="info-grid">
-
-        <div class="info">
-
-          <div class="info-label">
-            Código
-          </div>
-
-          <div class="info-value">
-            ${escapeHTML(certificado.codigo)}
-          </div>
-
-        </div>
-
-        <div class="info">
-
-          <div class="info-label">
-            Aluno
-          </div>
-
-          <div class="info-value">
-            ${escapeHTML(certificado.nome)}
-          </div>
-
-        </div>
-
-        <div class="info">
-
-          <div class="info-label">
-            CPF
-          </div>
-
-          <div class="info-value">
-            ${mascararCPF(certificado.cpf)}
-          </div>
-
-        </div>
-
-        <div class="info">
-
-          <div class="info-label">
-            Curso
-          </div>
-
-          <div class="info-value">
-            ${escapeHTML(certificado.curso)}
-          </div>
-
-        </div>
-
-        <div class="info">
-
-          <div class="info-label">
-            Carga Horária
-          </div>
-
-          <div class="info-value">
-            ${certificado.carga_horaria}h
-          </div>
-
-        </div>
-
-        <div class="info">
-
-          <div class="info-label">
-            Aproveitamento
-          </div>
-
-          <div class="info-value">
-            ${certificado.aproveitamento}%
-          </div>
-
-        </div>
-
-        <div class="info">
-
-          <div class="info-label">
-            Data da Certificação
-          </div>
-
-          <div class="info-value">
-            ${escapeHTML(certificado.data_certificacao)}
-          </div>
-
-        </div>
-
-      </div>
-
-      <div class="preview-item">
-
-        <div class="preview-label">
-          Conteúdo Programático
-        </div>
-
-        <ul>
-
-          ${certificado.conteudo
-            .map(
-              item =>
-                `<li>${escapeHTML(item)}</li>`
-            )
-            .join('')
-          }
-
-        </ul>
-
-      </div>
-
-    </div>
-
-  `;
-
-  result.style.display =
-    'block';
-
-}
-
-/* ==================================================
-   NÃO ENCONTRADO
-================================================== */
-
-function renderizarNaoEncontrado(){
-
-  const result =
-    document.getElementById(
-      'result'
-    );
-
-  if(!result) return;
-
-  result.innerHTML = `
-
-    <div class="card">
-
-      <div class="invalid">
-        ❌ Certificado não encontrado
-      </div>
-
-      <p>
-        O código informado não existe.
-      </p>
-
-    </div>
-
-  `;
-
-  result.style.display =
-    'block';
-
-}
-
-/* ==================================================
-   ERRO
-================================================== */
-
-function renderizarErro(){
-
-  const result =
-    document.getElementById(
-      'result'
-    );
-
-  if(!result) return;
-
-  result.innerHTML = `
-
-    <div class="card">
-
-      <div class="invalid">
-        ⚠️ Erro ao consultar
-      </div>
-
-      <p>
-        Não foi possível acessar o servidor.
-      </p>
-
-    </div>
-
-  `;
-
-  result.style.display =
-    'block';
 
 }
 
@@ -904,23 +417,14 @@ function renderizarErro(){
 function renderizarListaCertificados(){
 
   const container =
-    document.getElementById(
-      'listaCertificados'
-    );
+    document.getElementById('listaCertificados');
 
   if(!container) return;
 
-  if(
-    !certificados.length
-  ){
+  if(certificados.length === 0){
 
-    container.innerHTML = `
-
-      <div class="loading">
-        Nenhum certificado cadastrado.
-      </div>
-
-    `;
+    container.innerHTML =
+      `<div class="loading">Nenhum certificado cadastrado.</div>`;
 
     return;
 
@@ -931,62 +435,106 @@ function renderizarListaCertificados(){
     <table>
 
       <thead>
-
         <tr>
-
-          <th>
-            Código
-          </th>
-
-          <th>
-            Nome
-          </th>
-
-          <th>
-            Curso
-          </th>
-
-          <th>
-            Data
-          </th>
-
+          <th>Código</th>
+          <th>Nome</th>
+          <th>Curso</th>
+          <th>Data</th>
         </tr>
-
       </thead>
 
       <tbody>
 
-        ${certificados
-          .map(certificado => `
+        ${certificados.map(c => `
 
-            <tr>
+          <tr>
+            <td>${escapeHTML(c.codigo)}</td>
+            <td>${escapeHTML(c.nome)}</td>
+            <td>${escapeHTML(c.curso)}</td>
+            <td>${escapeHTML(c.data_certificacao)}</td>
+          </tr>
 
-              <td>
-                ${escapeHTML(certificado.codigo)}
-              </td>
-
-              <td>
-                ${escapeHTML(certificado.nome)}
-              </td>
-
-              <td>
-                ${escapeHTML(certificado.curso)}
-              </td>
-
-              <td>
-                ${escapeHTML(certificado.data_certificacao)}
-              </td>
-
-            </tr>
-
-          `)
-          .join('')
-        }
+        `).join('')}
 
       </tbody>
 
     </table>
 
   `;
+
+}
+
+/* ==================================================
+   VERIFICAR CERTIFICADO
+================================================== */
+
+async function verificarCertificado(){
+
+  const codigo =
+    document.getElementById('codigo')?.value.trim();
+
+  const result =
+    document.getElementById('result');
+
+  const loading =
+    document.getElementById('loading');
+
+  if(!codigo){
+    alert('Digite um código.');
+    return;
+  }
+
+  loading.style.display = 'block';
+  result.style.display = 'none';
+
+  try{
+
+    const lista = await buscarDados();
+
+    const certificado =
+      lista.find(c =>
+        c.codigo.toUpperCase() === codigo.toUpperCase()
+      );
+
+    loading.style.display = 'none';
+
+    if(certificado){
+
+      result.style.display = 'block';
+
+      result.innerHTML = `
+        <div class="card">
+          <div class="valid">✅ Certificado válido</div>
+          <p>${escapeHTML(certificado.nome)}</p>
+        </div>
+      `;
+
+    } else {
+
+      result.style.display = 'block';
+
+      result.innerHTML = `
+        <div class="card">
+          <div class="invalid">❌ Não encontrado</div>
+        </div>
+      `;
+
+    }
+
+  } catch(err){
+
+    console.error(err);
+
+    loading.style.display = 'none';
+
+    result.style.display = 'block';
+
+    result.innerHTML = `
+      <div class="card">
+        <div class="invalid">Erro ao consultar</div>
+      </div>
+    `;
+
+  }
 
 }
