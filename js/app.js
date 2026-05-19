@@ -163,25 +163,21 @@ async function salvarCertificado(){
       certificados: lista
     };
 
-    const response = await fetch(
-      `https://api.jsonbin.io/v3/b/${BIN_ID}`,
-      {
-        method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-          'X-Master-Key': ACCESS_KEY
-        },
-        body: JSON.stringify(payload)
-      }
-    );
 
-    const text = await response.text();
 
-    console.log('PUT RESPONSE:', text);
 
-    if(!response.ok){
-      throw new Error(`Erro HTTP ${response.status}`);
-    }
+const text = await response.text();
+
+console.log("STATUS:", response.status);
+console.log("RESPOSTA JSONBIN:", text);
+
+if(!response.ok){
+  throw new Error(text);
+}
+
+
+
+    
 
     alert('Certificado salvo com sucesso!');
 
