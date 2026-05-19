@@ -1,7 +1,6 @@
-
-/* =========================
+/* ==================================================
    CONFIG
-========================= */
+================================================== */
 
 const BIN_ID =
   '6a0a9e5cc0954111d83cf8b4';
@@ -12,17 +11,17 @@ const ACCESS_KEY =
 const API_URL =
   `https://api.jsonbin.io/v3/b/${BIN_ID}/latest`;
 
-/* =========================
+/* ==================================================
    GLOBAL
-========================= */
+================================================== */
 
 let certificados = [];
 
 let jsonGerado = '';
 
-/* =========================
+/* ==================================================
    INIT
-========================= */
+================================================== */
 
 document.addEventListener(
   'DOMContentLoaded',
@@ -35,9 +34,9 @@ document.addEventListener(
   }
 );
 
-/* =========================
-   FETCH PADRÃO
-========================= */
+/* ==================================================
+   FETCH DADOS
+================================================== */
 
 async function buscarDados(){
 
@@ -73,9 +72,9 @@ async function buscarDados(){
 
 }
 
-/* =========================
+/* ==================================================
    CARREGAR CERTIFICADOS
-========================= */
+================================================== */
 
 async function carregarCertificados(){
 
@@ -83,6 +82,8 @@ async function carregarCertificados(){
 
     certificados =
       await buscarDados();
+
+    renderizarListaCertificados();
 
     console.log(
       'Certificados carregados:',
@@ -100,9 +101,9 @@ async function carregarCertificados(){
 
 }
 
-/* =========================
-   GERAR CÓDIGO AUTOMÁTICO
-========================= */
+/* ==================================================
+   GERAR CÓDIGO
+================================================== */
 
 function preencherCodigoAutomatico(){
 
@@ -111,21 +112,17 @@ function preencherCodigoAutomatico(){
 
   if(!inputCodigo) return;
 
-  const numero =
-    String(
-      Math.floor(
-        Math.random() * 9999
-      )
-    ).padStart(4, '0');
+  const codigo =
+    `CERT-${Date.now()}-${Math.floor(Math.random() * 1000)}`;
 
   inputCodigo.value =
-    `CERT-${numero}`;
+    codigo;
 
 }
 
-/* =========================
+/* ==================================================
    FORMATAR DATA
-========================= */
+================================================== */
 
 function formatarData(dataISO){
 
@@ -141,11 +138,52 @@ function formatarData(dataISO){
 
 }
 
-/* =========================
-   GERAR JSON
-========================= */
+/* ==================================================
+   ESCAPE HTML
+================================================== */
 
-function gerarJSON(){
+function escapeHTML(texto){
+
+  if(!texto) return '';
+
+  const div =
+    document.createElement('div');
+
+  div.innerText = texto;
+
+  return div.innerHTML;
+
+}
+
+/* ==================================================
+   MASCARAR CPF
+================================================== */
+
+function mascararCPF(cpf){
+
+  if(!cpf) return '';
+
+  cpf =
+    cpf.replace(/\D/g, '');
+
+  if(cpf.length !== 11){
+
+    return cpf;
+
+  }
+
+  return cpf.replace(
+    /^(\d{3})\d{3}\d{3}(\d{2})$/,
+    '$1.***.***-$2'
+  );
+
+}
+
+/* ==================================================
+   OBTER DADOS FORM
+================================================== */
+
+function obterDadosFormulario(){
 
   const codigo =
     document.getElementById('codigo')
@@ -200,11 +238,11 @@ function gerarJSON(){
       'Preencha os campos obrigatórios.'
     );
 
-    return;
+    return null;
 
   }
 
-  const certificado = {
+  return {
 
     codigo,
 
@@ -226,6 +264,19 @@ function gerarJSON(){
     conteudo
 
   };
+
+}
+
+/* ==================================================
+   GERAR JSON
+================================================== */
+
+function gerarJSON(){
+
+  const certificado =
+    obterDadosFormulario();
+
+  if(!certificado) return;
 
   jsonGerado =
     JSON.stringify(
@@ -250,9 +301,9 @@ function gerarJSON(){
 
 }
 
-/* =========================
+/* ==================================================
    PREVIEW
-========================= */
+================================================== */
 
 function atualizarPreview(certificado){
 
@@ -272,7 +323,7 @@ function atualizarPreview(certificado){
       </div>
 
       <div class="preview-value">
-        ${certificado.codigo}
+        ${escapeHTML(certificado.codigo)}
       </div>
 
     </div>
@@ -284,7 +335,7 @@ function atualizarPreview(certificado){
       </div>
 
       <div class="preview-value">
-        ${certificado.nome}
+        ${escapeHTML(certificado.nome)}
       </div>
 
     </div>
@@ -296,7 +347,7 @@ function atualizarPreview(certificado){
       </div>
 
       <div class="preview-value">
-        ${certificado.cpf}
+        ${mascararCPF(certificado.cpf)}
       </div>
 
     </div>
@@ -308,7 +359,7 @@ function atualizarPreview(certificado){
       </div>
 
       <div class="preview-value">
-        ${certificado.curso}
+        ${escapeHTML(certificado.curso)}
       </div>
 
     </div>
@@ -344,7 +395,7 @@ function atualizarPreview(certificado){
       </div>
 
       <div class="preview-value">
-        ${certificado.data_certificacao}
+        ${escapeHTML(certificado.data_certificacao)}
       </div>
 
     </div>
@@ -360,7 +411,7 @@ function atualizarPreview(certificado){
         ${certificado.conteudo
           .map(
             item =>
-              `<li>${item}</li>`
+              `<li>${escapeHTML(item)}</li>`
           )
           .join('')
         }
@@ -373,9 +424,9 @@ function atualizarPreview(certificado){
 
 }
 
-/* =========================
+/* ==================================================
    COPIAR JSON
-========================= */
+================================================== */
 
 function copiarJSON(){
 
@@ -399,9 +450,160 @@ function copiarJSON(){
 
 }
 
-/* =========================
-   CONSULTAR CERTIFICADO
-========================= */
+/* ==================================================
+   SALVAR CERTIFICADO
+================================================== */
+
+async function salvarCertificado(){
+
+  try{
+
+    const certificado =
+      obterDadosFormulario();
+
+    if(!certificado) return;
+
+    const listaAtual =
+      await buscarDados();
+
+    const existe =
+      listaAtual.some(item =>
+
+        item.codigo.toUpperCase() ===
+        certificado.codigo.toUpperCase()
+
+      );
+
+    if(existe){
+
+      alert(
+        'Já existe certificado com esse código.'
+      );
+
+      return;
+
+    }
+
+    listaAtual.push(
+      certificado
+    );
+
+    const response =
+      await fetch(
+
+        `https://api.jsonbin.io/v3/b/${BIN_ID}`,
+
+        {
+
+          method: 'PUT',
+
+          headers: {
+
+            'Content-Type':
+              'application/json',
+
+            'X-Access-Key':
+              ACCESS_KEY
+
+          },
+
+          body:
+            JSON.stringify(listaAtual)
+
+        }
+
+      );
+
+    if(!response.ok){
+
+      throw new Error(
+        `Erro HTTP ${response.status}`
+      );
+
+    }
+
+    alert(
+      'Certificado salvo com sucesso.'
+    );
+
+    limparFormulario();
+
+    carregarCertificados();
+
+  } catch(error){
+
+    console.error(error);
+
+    alert(
+      'Erro ao salvar certificado.'
+    );
+
+  }
+
+}
+
+/* ==================================================
+   LIMPAR FORM
+================================================== */
+
+function limparFormulario(){
+
+  document
+    .querySelectorAll(
+      'input, textarea'
+    )
+    .forEach(campo => {
+
+      if(
+        campo.type !== 'button'
+      ){
+
+        campo.value = '';
+
+      }
+
+    });
+
+  const jsonOutput =
+    document.getElementById(
+      'jsonOutput'
+    );
+
+  if(jsonOutput){
+
+    jsonOutput.textContent = '';
+
+  }
+
+  const preview =
+    document.getElementById(
+      'previewContent'
+    );
+
+  if(preview){
+
+    preview.innerHTML = '';
+
+  }
+
+  const qrcode =
+    document.getElementById(
+      'qrcode'
+    );
+
+  if(qrcode){
+
+    qrcode.innerHTML = '';
+
+  }
+
+  preencherCodigoAutomatico();
+
+}
+
+/* ==================================================
+   VERIFICAR CERTIFICADO
+================================================== */
 
 async function verificarCertificado(){
 
@@ -487,9 +689,9 @@ async function verificarCertificado(){
 
 }
 
-/* =========================
-   RENDER VALID
-========================= */
+/* ==================================================
+   RENDER CERTIFICADO
+================================================== */
 
 function renderizarCertificado(
   certificado
@@ -519,7 +721,7 @@ function renderizarCertificado(
           </div>
 
           <div class="info-value">
-            ${certificado.codigo}
+            ${escapeHTML(certificado.codigo)}
           </div>
 
         </div>
@@ -531,7 +733,7 @@ function renderizarCertificado(
           </div>
 
           <div class="info-value">
-            ${certificado.nome}
+            ${escapeHTML(certificado.nome)}
           </div>
 
         </div>
@@ -543,7 +745,7 @@ function renderizarCertificado(
           </div>
 
           <div class="info-value">
-            ${certificado.cpf}
+            ${mascararCPF(certificado.cpf)}
           </div>
 
         </div>
@@ -555,7 +757,7 @@ function renderizarCertificado(
           </div>
 
           <div class="info-value">
-            ${certificado.curso}
+            ${escapeHTML(certificado.curso)}
           </div>
 
         </div>
@@ -591,7 +793,7 @@ function renderizarCertificado(
           </div>
 
           <div class="info-value">
-            ${certificado.data_certificacao}
+            ${escapeHTML(certificado.data_certificacao)}
           </div>
 
         </div>
@@ -609,7 +811,7 @@ function renderizarCertificado(
           ${certificado.conteudo
             .map(
               item =>
-                `<li>${item}</li>`
+                `<li>${escapeHTML(item)}</li>`
             )
             .join('')
           }
@@ -627,9 +829,9 @@ function renderizarCertificado(
 
 }
 
-/* =========================
-   NOT FOUND
-========================= */
+/* ==================================================
+   NÃO ENCONTRADO
+================================================== */
 
 function renderizarNaoEncontrado(){
 
@@ -661,9 +863,9 @@ function renderizarNaoEncontrado(){
 
 }
 
-/* =========================
-   ERROR
-========================= */
+/* ==================================================
+   ERRO
+================================================== */
 
 function renderizarErro(){
 
@@ -695,3 +897,96 @@ function renderizarErro(){
 
 }
 
+/* ==================================================
+   LISTAR CERTIFICADOS
+================================================== */
+
+function renderizarListaCertificados(){
+
+  const container =
+    document.getElementById(
+      'listaCertificados'
+    );
+
+  if(!container) return;
+
+  if(
+    !certificados.length
+  ){
+
+    container.innerHTML = `
+
+      <div class="loading">
+        Nenhum certificado cadastrado.
+      </div>
+
+    `;
+
+    return;
+
+  }
+
+  container.innerHTML = `
+
+    <table>
+
+      <thead>
+
+        <tr>
+
+          <th>
+            Código
+          </th>
+
+          <th>
+            Nome
+          </th>
+
+          <th>
+            Curso
+          </th>
+
+          <th>
+            Data
+          </th>
+
+        </tr>
+
+      </thead>
+
+      <tbody>
+
+        ${certificados
+          .map(certificado => `
+
+            <tr>
+
+              <td>
+                ${escapeHTML(certificado.codigo)}
+              </td>
+
+              <td>
+                ${escapeHTML(certificado.nome)}
+              </td>
+
+              <td>
+                ${escapeHTML(certificado.curso)}
+              </td>
+
+              <td>
+                ${escapeHTML(certificado.data_certificacao)}
+              </td>
+
+            </tr>
+
+          `)
+          .join('')
+        }
+
+      </tbody>
+
+    </table>
+
+  `;
+
+}
