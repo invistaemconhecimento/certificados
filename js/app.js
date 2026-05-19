@@ -186,10 +186,14 @@ if(!response.ok){
 
   }catch(err){
 
-    console.error('ERRO SALVAR:', err);
+  console.log("ERRO COMPLETO:", err);
 
-    alert('Erro ao salvar certificado');
-  }
+  alert(
+    "Erro ao salvar certificado.\n\n" +
+    (err?.message || err)
+  );
+
+}
 }
 
 /* =========================
