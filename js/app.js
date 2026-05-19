@@ -1,7 +1,3 @@
-/* ==================================================
-   CONFIG
-================================================== */
-
 const BIN_ID =
   '6a0a9e5cc0954111d83cf8b4';
 
@@ -11,210 +7,92 @@ const ACCESS_KEY =
 const API_URL =
   `https://api.jsonbin.io/v3/b/${BIN_ID}/latest`;
 
-/* ==================================================
-   GLOBAL
-================================================== */
-
 let certificados = [];
-
 let jsonGerado = '';
 
-/* ==================================================
-   INIT
-================================================== */
+document.addEventListener('DOMContentLoaded', () => {
+  carregarCertificados();
+  preencherCodigoAutomatico();
+});
 
-document.addEventListener(
-  'DOMContentLoaded',
-  () => {
-
-    carregarCertificados();
-
-    preencherCodigoAutomatico();
-
-  }
-);
-
-/* ==================================================
-   BUSCAR DADOS JSONBIN
-================================================== */
+/* =========================
+   BUSCAR DADOS
+========================= */
 
 async function buscarDados(){
 
-  const response =
-    await fetch(API_URL, {
-
-      method: 'GET',
-
-      headers: {
-
-        'Content-Type':
-          'application/json',
-
-        'X-Access-Key':
-          ACCESS_KEY
-
-      }
-
-    });
+  const response = await fetch(API_URL, {
+    method: 'GET',
+    headers: {
+      'Content-Type': 'application/json',
+      'X-Master-Key': ACCESS_KEY
+    }
+  });
 
   if(!response.ok){
-
-    throw new Error(
-      `Erro HTTP ${response.status}`
-    );
-
+    throw new Error(`Erro HTTP ${response.status}`);
   }
 
-  const data =
-    await response.json();
+  const data = await response.json();
 
-  console.log(
-    'Dados JSONBin:',
-    data
-  );
+  console.log('JSONBin:', data);
 
-  return data.record || [];
-
+  return data.record?.certificados || [];
 }
 
-/* ==================================================
-   CARREGAR CERTIFICADOS
-================================================== */
+/* =========================
+   CARREGAR
+========================= */
 
 async function carregarCertificados(){
 
   try{
 
-    certificados =
-      await buscarDados();
-
+    certificados = await buscarDados();
     renderizarListaCertificados();
 
-    console.log(
-      'Certificados carregados:',
-      certificados
-    );
-
-  } catch(error){
-
-    console.error(
-      'Erro ao carregar certificados:',
-      error
-    );
-
+  }catch(err){
+    console.error(err);
   }
-
 }
 
-/* ==================================================
-   GERAR CÓDIGO AUTOMÁTICO
-================================================== */
+/* =========================
+   GERAR CÓDIGO
+========================= */
 
 function preencherCodigoAutomatico(){
 
-  const input =
-    document.getElementById('codigo');
-
+  const input = document.getElementById('codigo');
   if(!input) return;
 
-  const codigo =
-    `CERT-${Date.now()}-${Math.floor(Math.random() * 1000)}`;
-
-  input.value = codigo;
-
+  input.value =
+    `CERT-${Date.now()}-${Math.floor(Math.random()*1000)}`;
 }
 
-/* ==================================================
-   FORMATAR DATA
-================================================== */
-
-function formatarData(dataISO){
-
-  if(!dataISO) return '';
-
-  const [ano, mes, dia] = dataISO.split('-');
-
-  return `${dia}/${mes}/${ano}`;
-
-}
-
-/* ==================================================
-   ESCAPE HTML (SEGURANÇA)
-================================================== */
-
-function escapeHTML(texto){
-
-  if(!texto) return '';
-
-  const div = document.createElement('div');
-
-  div.innerText = texto;
-
-  return div.innerHTML;
-
-}
-
-/* ==================================================
-   MASCARAR CPF
-================================================== */
-
-function mascararCPF(cpf){
-
-  if(!cpf) return '';
-
-  cpf = cpf.replace(/\D/g, '');
-
-  if(cpf.length !== 11) return cpf;
-
-  return cpf.replace(
-    /^(\d{3})\d{3}\d{3}(\d{2})$/,
-    '$1.***.***-$2'
-  );
-
-}
-
-/* ==================================================
-   OBTER DADOS DO FORM
-================================================== */
+/* =========================
+   FORM DATA
+========================= */
 
 function obterDadosFormulario(){
 
-  const codigo =
-    document.getElementById('codigo')?.value.trim();
+  const codigo = document.getElementById('codigo')?.value.trim();
+  const nome = document.getElementById('nome')?.value.trim();
+  const cpf = document.getElementById('cpf')?.value.trim();
+  const curso = document.getElementById('curso')?.value.trim();
+  const carga = document.getElementById('carga')?.value.trim();
+  const aproveitamento = document.getElementById('aproveitamento')?.value.trim();
+  const data = document.getElementById('data')?.value;
 
-  const nome =
-    document.getElementById('nome')?.value.trim();
-
-  const cpf =
-    document.getElementById('cpf')?.value.trim();
-
-  const curso =
-    document.getElementById('curso')?.value.trim();
-
-  const carga =
-    document.getElementById('carga')?.value.trim();
-
-  const aproveitamento =
-    document.getElementById('aproveitamento')?.value.trim();
-
-  const data =
-    document.getElementById('data')?.value;
-
-  const conteudo =
-    document.getElementById('conteudo')?.value
-      .split('\n')
-      .filter(i => i.trim() !== '');
+  const conteudo = document.getElementById('conteudo')?.value
+    .split('\n')
+    .filter(i => i.trim() !== '');
 
   if(!codigo || !nome || !cpf || !curso){
-
-    alert('Preencha os campos obrigatórios.');
-
+    alert('Preencha os campos obrigatórios');
     return null;
-
   }
 
   return {
-
     codigo,
     nome,
     cpf,
@@ -223,145 +101,60 @@ function obterDadosFormulario(){
     aproveitamento: Number(aproveitamento),
     data_certificacao: formatarData(data),
     conteudo
-
   };
-
 }
 
-/* ==================================================
-   GERAR JSON
-================================================== */
+/* =========================
+   FORMATAR DATA
+========================= */
 
-function gerarJSON(){
+function formatarData(data){
 
-  const certificado =
-    obterDadosFormulario();
+  if(!data) return '';
 
-  if(!certificado) return;
-
-  jsonGerado =
-    JSON.stringify(certificado, null, 2);
-
-  document.getElementById('jsonOutput')
-    .textContent = jsonGerado;
-
-  atualizarPreview(certificado);
-
+  const [y,m,d] = data.split('-');
+  return `${d}/${m}/${y}`;
 }
 
-/* ==================================================
-   PREVIEW
-================================================== */
-
-function atualizarPreview(certificado){
-
-  const preview =
-    document.getElementById('previewContent');
-
-  if(!preview) return;
-
-  preview.innerHTML = `
-
-    <div class="preview-item">
-      <div class="preview-label">Código</div>
-      <div class="preview-value">${escapeHTML(certificado.codigo)}</div>
-    </div>
-
-    <div class="preview-item">
-      <div class="preview-label">Nome</div>
-      <div class="preview-value">${escapeHTML(certificado.nome)}</div>
-    </div>
-
-    <div class="preview-item">
-      <div class="preview-label">CPF</div>
-      <div class="preview-value">${mascararCPF(certificado.cpf)}</div>
-    </div>
-
-    <div class="preview-item">
-      <div class="preview-label">Curso</div>
-      <div class="preview-value">${escapeHTML(certificado.curso)}</div>
-    </div>
-
-    <div class="preview-item">
-      <div class="preview-label">Carga Horária</div>
-      <div class="preview-value">${certificado.carga_horaria}h</div>
-    </div>
-
-    <div class="preview-item">
-      <div class="preview-label">Aproveitamento</div>
-      <div class="preview-value">${certificado.aproveitamento}%</div>
-    </div>
-
-    <div class="preview-item">
-      <div class="preview-label">Data</div>
-      <div class="preview-value">${escapeHTML(certificado.data_certificacao)}</div>
-    </div>
-
-  `;
-
-}
-
-/* ==================================================
-   COPIAR JSON
-================================================== */
-
-function copiarJSON(){
-
-  if(!jsonGerado){
-    alert('Nenhum JSON gerado.');
-    return;
-  }
-
-  navigator.clipboard.writeText(jsonGerado);
-
-  alert('JSON copiado com sucesso.');
-
-}
-
-/* ==================================================
-   SALVAR CERTIFICADO NO JSONBIN
-================================================== */
+/* =========================
+   SALVAR CERTIFICADO
+========================= */
 
 async function salvarCertificado(){
 
   try{
 
-    const certificado =
-      obterDadosFormulario();
+    const novo = obterDadosFormulario();
+    if(!novo) return;
 
-    if(!certificado) return;
+    const lista = await buscarDados();
 
-    const listaAtual =
-      await buscarDados();
-
-    if(!Array.isArray(listaAtual)){
-      throw new Error('Formato inválido no JSONBin.');
-    }
-
-    const existe =
-      listaAtual.some(item =>
-        item.codigo.toUpperCase() === certificado.codigo.toUpperCase()
-      );
+    const existe = lista.some(c =>
+      c.codigo.toUpperCase() === novo.codigo.toUpperCase()
+    );
 
     if(existe){
-      alert('Já existe certificado com esse código.');
+      alert('Código já existe');
       return;
     }
 
-    listaAtual.push(certificado);
+    lista.push(novo);
 
-    const response =
-      await fetch(
-        `https://api.jsonbin.io/v3/b/${BIN_ID}`,
-        {
-          method: 'PUT',
-          headers: {
-            'Content-Type': 'application/json',
-            'X-Access-Key': ACCESS_KEY
-          },
-          body: JSON.stringify(listaAtual)
-        }
-      );
+    const payload = {
+      certificados: lista
+    };
+
+    const response = await fetch(
+      `https://api.jsonbin.io/v3/b/${BIN_ID}`,
+      {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-Master-Key': ACCESS_KEY
+        },
+        body: JSON.stringify(payload)
+      }
+    );
 
     if(!response.ok){
       throw new Error(`Erro HTTP ${response.status}`);
@@ -370,70 +163,43 @@ async function salvarCertificado(){
     alert('Certificado salvo com sucesso!');
 
     limparFormulario();
-
     carregarCertificados();
 
-  } catch(error){
-
-    console.error(error);
-
-    alert('Erro ao salvar certificado.');
-
+  }catch(err){
+    console.error(err);
+    alert('Erro ao salvar certificado');
   }
-
 }
 
-/* ==================================================
+/* =========================
    LIMPAR FORM
-================================================== */
+========================= */
 
 function limparFormulario(){
 
-  document.querySelectorAll('input, textarea')
-    .forEach(c => {
-
-      if(c.type !== 'button'){
-        c.value = '';
-      }
-
-    });
-
-  jsonGerado = '';
-
-  document.getElementById('jsonOutput').textContent = '';
-
-  document.getElementById('previewContent').innerHTML = '';
-
-  document.getElementById('qrcode').innerHTML = '';
+  document.querySelectorAll('input, textarea').forEach(i=>{
+    if(i.type !== 'button') i.value = '';
+  });
 
   preencherCodigoAutomatico();
-
 }
 
-/* ==================================================
-   LISTAR CERTIFICADOS
-================================================== */
+/* =========================
+   LISTA
+========================= */
 
 function renderizarListaCertificados(){
 
-  const container =
-    document.getElementById('listaCertificados');
-
-  if(!container) return;
+  const el = document.getElementById('listaCertificados');
+  if(!el) return;
 
   if(certificados.length === 0){
-
-    container.innerHTML =
-      `<div class="loading">Nenhum certificado cadastrado.</div>`;
-
+    el.innerHTML = '<p>Nenhum certificado</p>';
     return;
-
   }
 
-  container.innerHTML = `
-
+  el.innerHTML = `
     <table>
-
       <thead>
         <tr>
           <th>Código</th>
@@ -442,99 +208,56 @@ function renderizarListaCertificados(){
           <th>Data</th>
         </tr>
       </thead>
-
       <tbody>
-
-        ${certificados.map(c => `
-
+        ${certificados.map(c=>`
           <tr>
-            <td>${escapeHTML(c.codigo)}</td>
-            <td>${escapeHTML(c.nome)}</td>
-            <td>${escapeHTML(c.curso)}</td>
-            <td>${escapeHTML(c.data_certificacao)}</td>
+            <td>${c.codigo}</td>
+            <td>${c.nome}</td>
+            <td>${c.curso}</td>
+            <td>${c.data_certificacao}</td>
           </tr>
-
         `).join('')}
-
       </tbody>
-
     </table>
-
   `;
-
 }
 
-/* ==================================================
-   VERIFICAR CERTIFICADO
-================================================== */
+/* =========================
+   VERIFICAR
+========================= */
 
 async function verificarCertificado(){
 
-  const codigo =
-    document.getElementById('codigo')?.value.trim();
-
-  const result =
-    document.getElementById('result');
-
-  const loading =
-    document.getElementById('loading');
+  const codigo = document.getElementById('codigo')?.value.trim();
+  const result = document.getElementById('result');
 
   if(!codigo){
-    alert('Digite um código.');
+    alert('Digite o código');
     return;
   }
 
-  loading.style.display = 'block';
-  result.style.display = 'none';
+  const lista = await buscarDados();
 
-  try{
+  const cert = lista.find(c =>
+    c.codigo.toUpperCase() === codigo.toUpperCase()
+  );
 
-    const lista = await buscarDados();
-
-    const certificado =
-      lista.find(c =>
-        c.codigo.toUpperCase() === codigo.toUpperCase()
-      );
-
-    loading.style.display = 'none';
-
-    if(certificado){
-
-      result.style.display = 'block';
-
-      result.innerHTML = `
-        <div class="card">
-          <div class="valid">✅ Certificado válido</div>
-          <p>${escapeHTML(certificado.nome)}</p>
-        </div>
-      `;
-
-    } else {
-
-      result.style.display = 'block';
-
-      result.innerHTML = `
-        <div class="card">
-          <div class="invalid">❌ Não encontrado</div>
-        </div>
-      `;
-
-    }
-
-  } catch(err){
-
-    console.error(err);
-
-    loading.style.display = 'none';
-
-    result.style.display = 'block';
+  if(cert){
 
     result.innerHTML = `
       <div class="card">
-        <div class="invalid">Erro ao consultar</div>
+        <h3>✅ Válido</h3>
+        <p>${cert.nome}</p>
+        <p>${cert.curso}</p>
       </div>
     `;
 
-  }
+  }else{
 
+    result.innerHTML = `
+      <div class="card">
+        <h3>❌ Não encontrado</h3>
+      </div>
+    `;
+  }
 }
