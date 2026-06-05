@@ -5,35 +5,38 @@ const API_KEY =
 '$2a$10$FHeRXKCTxHAD8HgExcIosujSiuAfP8pxLCkGF1wVKmD4n0t32vqWu';
 
 const API_URL =
-`https://api.jsonbin.io/v3/b/${BIN_ID}`;
+`https://api.jsonbin.io/v3/b/${BIN_ID}/latest`;
 
 async function carregarDados() {
 
     try {
 
         const response = await fetch(API_URL, {
+            method: 'GET',
             headers: {
                 'X-Master-Key': API_KEY
             }
         });
 
+        if (!response.ok) {
+            throw new Error('Erro ao acessar JSONBin');
+        }
+
         const data = await response.json();
 
-        if (!data.record) {
-            return {
-                certificados: []
-            };
+        console.log('JSONBin:', data);
+
+        if (data.record) {
+            return data.record;
         }
 
-        if (!data.record.certificados) {
-            data.record.certificados = [];
-        }
-
-        return data.record;
+        return {
+            certificados: []
+        };
 
     } catch (erro) {
 
-        console.error("Erro ao carregar dados:", erro);
+        console.error('Erro ao carregar dados:', erro);
 
         return {
             certificados: []
@@ -53,17 +56,25 @@ async function consultar() {
         if (!codigo) {
 
             document.getElementById("resultado").innerHTML =
-                "<p>Digite um código para consultar.</p>";
+                "<p>Digite um código.</p>";
 
             return;
         }
 
         const dados = await carregarDados();
 
-        const certificado =
-            dados.certificados.find(
-                c => c.codigo === codigo
-            );
+        if (!dados.certificados) {
+
+            document.getElementById("resultado").innerHTML =
+                "<h2>Nenhum certificado cadastrado.</h2>";
+
+            return;
+        }
+
+        const certificado = dados.certificados.find(c =>
+            String(c.codigo).trim().toUpperCase() ===
+            String(codigo).trim().toUpperCase()
+        );
 
         const resultado =
             document.getElementById("resultado");
@@ -72,48 +83,42 @@ async function consultar() {
 
             resultado.innerHTML = `
 
-            <div class="resultado-valido">
+                <div class="resultado-valido">
 
-                <h2>✅ Certificado Válido</h2>
+                    <h2>✅ Certificado Válido</h2>
 
-                <p><strong>Código:</strong>
-                ${certificado.codigo || ''}</p>
+                    <p><strong>Código:</strong>
+                    ${certificado.codigo || ''}</p>
 
-                <p><strong>Aluno:</strong>
-                ${certificado.nome || ''}</p>
+                    <p><strong>Aluno:</strong>
+                    ${certificado.nome || ''}</p>
 
-                <p><strong>CPF:</strong>
-                ${certificado.cpf || ''}</p>
+                    <p><strong>CPF:</strong>
+                    ${certificado.cpf || ''}</p>
 
-                <p><strong>Curso:</strong>
-                ${certificado.curso || ''}</p>
+                    <p><strong>Curso:</strong>
+                    ${certificado.curso || ''}</p>
 
-                <p><strong>Carga Horária:</strong>
-                ${certificado.cargaHoraria || ''}</p>
+                    <p><strong>Carga Horária:</strong>
+                    ${certificado.cargaHoraria || ''}</p>
 
-                <p><strong>Aproveitamento:</strong>
-                ${certificado.aproveitamento || ''}</p>
+                    <p><strong>Aproveitamento:</strong>
+                    ${certificado.aproveitamento || ''}</p>
 
-                <p><strong>Data de Conclusão:</strong>
-                ${certificado.dataConclusao || ''}</p>
+                    <p><strong>Data de Conclusão:</strong>
+                    ${certificado.dataConclusao || ''}</p>
 
-                <p><strong>Status:</strong>
-                ${certificado.status || ''}</p>
+                    <p><strong>Status:</strong>
+                    ${certificado.status || ''}</p>
 
-            </div>
+                </div>
 
             `;
 
         } else {
 
             resultado.innerHTML = `
-
-            <div>
-
                 <h2>❌ Certificado não encontrado</h2>
-
-            </div>
-
             `;
         }
 
@@ -121,9 +126,8 @@ async function consultar() {
 
         console.error(erro);
 
-        document.getElementById("resultado").innerHTML = `
-            <h2>Erro ao consultar certificado.</h2>
-        `;
+        document.getElementById("resultado").innerHTML =
+            "<h2>Erro ao consultar certificado.</h2>";
     }
 }
 
@@ -161,6 +165,10 @@ async function salvarCertificado() {
         const dados =
             await carregarDados();
 
+        if (!dados.certificados) {
+            dados.certificados = [];
+        }
+
         const codigoGerado =
             "CERT-" + Date.now();
 
@@ -186,17 +194,20 @@ async function salvarCertificado() {
 
         });
 
-        const resposta = await fetch(API_URL, {
-            method: 'PUT',
-            headers: {
-                'Content-Type': 'application/json',
-                'X-Master-Key': API_KEY
-            },
-            body: JSON.stringify(dados)
-        });
+        const resposta = await fetch(
+            `https://api.jsonbin.io/v3/b/${BIN_ID}`,
+            {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-Master-Key': API_KEY
+                },
+                body: JSON.stringify(dados)
+            }
+        );
 
         if (!resposta.ok) {
-            throw new Error("Erro ao salvar");
+            throw new Error('Erro ao salvar');
         }
 
         document.getElementById("nome").value = "";
