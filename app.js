@@ -46,7 +46,7 @@ async function consultar() {
         );
 
         resultado.innerHTML = `
-        <h2>✅ Certificado Válido</h2>
+        <h2>Certificado Válido</h2>
 
         <p><b>Código:</b>
         ${certificado.codigo}</p>
