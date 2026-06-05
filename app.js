@@ -7,7 +7,7 @@ const API_URL =
 
 async function carregarDados() {
 
-```
+
 const response = await fetch(API_URL, {
     headers: {
         'X-Master-Key': API_KEY
@@ -21,7 +21,7 @@ if (!response.ok) {
 const data = await response.json();
 
 return data.record;
-```
+
 
 }
 
@@ -105,13 +105,13 @@ try {
     document.getElementById("resultado").innerHTML =
         "<h2>Erro ao consultar certificado.</h2>";
 }
-```
+
 
 }
 
 async function salvarCertificado() {
 
-```
+
 try {
 
     const dados =
@@ -175,6 +175,6 @@ try {
         'Erro ao salvar certificado.'
     );
 }
-```
+
 
 }
