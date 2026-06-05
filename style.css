@@ -1,99 +1,28 @@
 body{
-margin:0;
-font-family:'Segoe UI', Arial, sans-serif;
-background:#f4f5f7;
-color:#1e2f4d;
-}
-
-header{
-background:#ffffff;
-border-bottom:1px solid #dcdcdc;
-text-align:center;
-padding:15px;
-}
-
-.logo{
-height:60px;
+font-family:Arial,sans-serif;
+background:#f5f7fa;
 }
 
 .container{
-max-width:900px;
-margin:50px auto;
-text-align:center;
-}
-
-h1{
-font-size:56px;
-margin-bottom:15px;
-color:#13294b;
-}
-
-.subtitulo{
-font-size:18px;
-color:#68768c;
-margin-bottom:40px;
-}
-
-.box-consulta{
-background:#ffffff;
-padding:25px;
-border-radius:16px;
-box-shadow:0 5px 20px rgba(0,0,0,.08);
-display:flex;
-gap:12px;
-align-items:center;
-justify-content:center;
-}
-
-#codigo{
-flex:1;
-height:50px;
-border:1px solid #d6dce5;
+max-width:600px;
+margin:auto;
+padding:20px;
+background:white;
 border-radius:12px;
-padding:0 15px;
-font-size:16px;
+margin-top:40px;
+box-shadow:0 0 10px rgba(0,0,0,.1);
 }
 
-.btn-consultar{
-height:50px;
-min-width:140px;
+input{
+width:100%;
+padding:10px;
+margin:10px 0;
+}
+
+button{
+padding:10px 20px;
+background:#2563eb;
+color:white;
 border:none;
-border-radius:12px;
-background:#13294b;
-color:#fff;
-font-size:16px;
 cursor:pointer;
-}
-
-.btn-consultar:hover{
-opacity:.9;
-}
-
-#resultado{
-margin-top:30px;
-}
-
-.resultado-valido{
-background:#ffffff;
-border-left:5px solid #16a34a;
-padding:25px;
-border-radius:12px;
-box-shadow:0 4px 12px rgba(0,0,0,.08);
-text-align:left;
-}
-
-.resultado-invalido{
-background:#ffffff;
-border-left:5px solid #dc2626;
-padding:25px;
-border-radius:12px;
-box-shadow:0 4px 12px rgba(0,0,0,.08);
-}
-
-footer{
-margin-top:80px;
-border-top:1px solid #dcdcdc;
-text-align:center;
-padding:25px;
-color:#68768c;
 }
