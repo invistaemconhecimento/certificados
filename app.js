@@ -9,100 +9,112 @@ const API_URL =
 
 async function carregarDados() {
 
-const response = await fetch(API_URL,{
-headers:{
-'X-Master-Key':API_KEY
-}
-});
+    const response = await fetch(API_URL,{
+        headers:{
+            'X-Master-Key':API_KEY
+        }
+    });
 
-const data = await response.json();
+    const data = await response.json();
 
-return data.record;
+    return data.record;
 
 }
 
 async function consultar() {
 
-const codigo =
-document.getElementById("codigo").value;
+    const codigo =
+    document.getElementById("codigo").value;
 
-const dados =
-await carregarDados();
+    const dados =
+    await carregarDados();
 
-const certificado =
-dados.certificados.find(
-c => c.codigo === codigo
-);
+    const certificado =
+    dados.certificados.find(
+        c => c.codigo === codigo
+    );
 
-const resultado =
-document.getElementById("resultado");
+    const resultado =
+    document.getElementById("resultado");
 
-if(certificado){
+    if(certificado){
 
-resultado.innerHTML = `
-<h2>Certificado Válido</h2>
+        const cpfMascarado =
+        certificado.cpf.replace(
+            /(\d{3})\.(\d{3})\.(\d{3})-(\d{2})/,
+            '$1.***.***-$4'
+        );
 
-<p><b>Aluno:</b>
-${certificado.nome}</p>
+        resultado.innerHTML = `
+        <h2>✅ Certificado Válido</h2>
 
-<p><b>Curso:</b>
-${certificado.curso}</p>
+        <p><b>Código:</b>
+        ${certificado.codigo}</p>
 
-<p><b>Carga Horária:</b>
-${certificado.cargaHoraria}</p>
+        <p><b>Aluno:</b>
+        ${certificado.nome}</p>
 
-<p><b>Aproveitamento:</b>
-${certificado.aproveitamento}</p>
+        <p><b>CPF:</b>
+        ${cpfMascarado}</p>
 
-<p><b>Data de Conclusão:</b>
-${certificado.dataConclusao}</p>
+        <p><b>Curso:</b>
+        ${certificado.curso}</p>
 
-<p><b>Status:</b>
-${certificado.status}</p>
-`;
+        <p><b>Carga Horária:</b>
+        ${certificado.cargaHoraria}</p>
 
-}else{
+        <p><b>Aproveitamento:</b>
+        ${certificado.aproveitamento}</p>
 
-resultado.innerHTML =
-"<h2>Certificado não encontrado</h2>";
+        <p><b>Data de Conclusão:</b>
+        ${certificado.dataConclusao}</p>
 
-}
+        <p><b>Status:</b>
+        ${certificado.status}</p>
+        `;
+
+    }else{
+
+        resultado.innerHTML =
+        "<h2>❌ Certificado não encontrado</h2>";
+
+    }
 
 }
 
 async function salvarCertificado(){
 
-const dados =
-await carregarDados();
+    const dados =
+    await carregarDados();
 
-dados.certificados.push({
+    dados.certificados.push({
 
-codigo:
-Date.now().toString(),
+        codigo:
+        Date.now().toString(),
 
-nome:
-document.getElementById("nome").value,
+        nome:
+        document.getElementById("nome").value,
 
-cpf:
-document.getElementById("cpf").value,
+        cpf:
+        document.getElementById("cpf").value,
 
-curso:
-document.getElementById("curso").value,
+        curso:
+        document.getElementById("curso").value,
 
-status:
-"Válido"
+        status:
+        "Válido"
 
-});
+    });
 
-await fetch(API_URL,{
-method:'PUT',
-headers:{
-'Content-Type':'application/json',
-'X-Master-Key':API_KEY
-},
-body:JSON.stringify(dados)
-});
+    await fetch(API_URL,{
+        method:'PUT',
+        headers:{
+            'Content-Type':'application/json',
+            'X-Master-Key':API_KEY
+        },
+        body:JSON.stringify(dados)
+    });
 
-alert('Certificado salvo');
+    alert('Certificado salvo');
 
 }
