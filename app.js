@@ -2,83 +2,127 @@ const BIN_ID =
 '6a0c19da6877513b27975609';
 
 const API_KEY =
-'SUA_MASTER_KEY_AQUI';
+'$2a$10$FHeRXKCTxHAD8HgExcIosujSiuAfP8pxLCkGF1wVKmD4n0t32vqWu';
 
 const API_URL =
 `https://api.jsonbin.io/v3/b/${BIN_ID}`;
 
 async function carregarDados() {
 
-    const response = await fetch(API_URL, {
-        headers: {
-            'X-Master-Key': API_KEY
+    try {
+
+        const response = await fetch(API_URL, {
+            headers: {
+                'X-Master-Key': API_KEY
+            }
+        });
+
+        const data = await response.json();
+
+        if (!data.record) {
+            return {
+                certificados: []
+            };
         }
-    });
 
-    const data = await response.json();
+        if (!data.record.certificados) {
+            data.record.certificados = [];
+        }
 
-    if (!data.record) {
+        return data.record;
+
+    } catch (erro) {
+
+        console.error("Erro ao carregar dados:", erro);
+
         return {
             certificados: []
         };
     }
-
-    if (!data.record.certificados) {
-        data.record.certificados = [];
-    }
-
-    return data.record;
 }
 
 async function consultar() {
 
-    const codigo =
-        document.getElementById("codigo")
-        .value
-        .trim();
+    try {
 
-    const dados =
-        await carregarDados();
+        const codigo = document
+            .getElementById("codigo")
+            .value
+            .trim();
 
-    const certificado =
-        dados.certificados.find(
-            c => c.codigo === codigo
-        );
+        if (!codigo) {
 
-    const resultado =
-        document.getElementById("resultado");
+            document.getElementById("resultado").innerHTML =
+                "<p>Digite um código para consultar.</p>";
 
-    if (certificado) {
+            return;
+        }
 
-        resultado.innerHTML = `
+        const dados = await carregarDados();
 
-        <div class="resultado-valido">
+        const certificado =
+            dados.certificados.find(
+                c => c.codigo === codigo
+            );
 
-        <h2>✅ Certificado Válido</h2>
+        const resultado =
+            document.getElementById("resultado");
 
-        <p><strong>Código:</strong> ${certificado.codigo}</p>
+        if (certificado) {
 
-        <p><strong>Aluno:</strong> ${certificado.nome}</p>
+            resultado.innerHTML = `
 
-        <p><strong>CPF:</strong> ${certificado.cpf}</p>
+            <div class="resultado-valido">
 
-        <p><strong>Curso:</strong> ${certificado.curso}</p>
+                <h2>✅ Certificado Válido</h2>
 
-        <p><strong>Carga Horária:</strong> ${certificado.cargaHoraria}</p>
+                <p><strong>Código:</strong>
+                ${certificado.codigo || ''}</p>
 
-        <p><strong>Aproveitamento:</strong> ${certificado.aproveitamento}</p>
+                <p><strong>Aluno:</strong>
+                ${certificado.nome || ''}</p>
 
-        <p><strong>Data de Conclusão:</strong> ${certificado.dataConclusao}</p>
+                <p><strong>CPF:</strong>
+                ${certificado.cpf || ''}</p>
 
-        <p><strong>Status:</strong> ${certificado.status}</p>
+                <p><strong>Curso:</strong>
+                ${certificado.curso || ''}</p>
 
-        </div>
-        `;
+                <p><strong>Carga Horária:</strong>
+                ${certificado.cargaHoraria || ''}</p>
 
-    } else {
+                <p><strong>Aproveitamento:</strong>
+                ${certificado.aproveitamento || ''}</p>
 
-        resultado.innerHTML = `
-        <h2>❌ Certificado não encontrado</h2>
+                <p><strong>Data de Conclusão:</strong>
+                ${certificado.dataConclusao || ''}</p>
+
+                <p><strong>Status:</strong>
+                ${certificado.status || ''}</p>
+
+            </div>
+
+            `;
+
+        } else {
+
+            resultado.innerHTML = `
+
+            <div>
+
+                <h2>❌ Certificado não encontrado</h2>
+
+            </div>
+
+            `;
+        }
+
+    } catch (erro) {
+
+        console.error(erro);
+
+        document.getElementById("resultado").innerHTML = `
+            <h2>Erro ao consultar certificado.</h2>
         `;
     }
 }
@@ -87,34 +131,54 @@ async function salvarCertificado() {
 
     try {
 
+        const nome =
+            document.getElementById("nome").value.trim();
+
+        const cpf =
+            document.getElementById("cpf").value.trim();
+
+        const curso =
+            document.getElementById("curso").value.trim();
+
+        const cargaHoraria =
+            document.getElementById("cargaHoraria").value.trim();
+
+        const aproveitamento =
+            document.getElementById("aproveitamento").value.trim();
+
+        const dataConclusao =
+            document.getElementById("dataConclusao").value.trim();
+
+        if (!nome || !cpf || !curso) {
+
+            alert(
+                "Preencha Nome, CPF e Curso."
+            );
+
+            return;
+        }
+
         const dados =
             await carregarDados();
 
         const codigoGerado =
-            'CERT-' +
-            Date.now();
+            "CERT-" + Date.now();
 
         dados.certificados.push({
 
             codigo: codigoGerado,
 
-            nome:
-                document.getElementById("nome").value,
+            nome: nome,
 
-            cpf:
-                document.getElementById("cpf").value,
+            cpf: cpf,
 
-            curso:
-                document.getElementById("curso").value,
+            curso: curso,
 
-            cargaHoraria:
-                document.getElementById("cargaHoraria").value,
+            cargaHoraria: cargaHoraria,
 
-            aproveitamento:
-                document.getElementById("aproveitamento").value,
+            aproveitamento: aproveitamento,
 
-            dataConclusao:
-                document.getElementById("dataConclusao").value,
+            dataConclusao: dataConclusao,
 
             status: "Válido",
 
