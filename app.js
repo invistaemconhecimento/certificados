@@ -6,3 +6,94 @@ const API_KEY =
 
 const API_URL =
 `https://api.jsonbin.io/v3/b/${BIN_ID}`;
+
+async function carregarDados() {
+
+const response = await fetch(API_URL,{
+headers:{
+'X-Master-Key':API_KEY
+}
+});
+
+const data = await response.json();
+
+return data.record;
+
+}
+
+async function consultar() {
+
+const codigo =
+document.getElementById("codigo").value;
+
+const dados =
+await carregarDados();
+
+const certificado =
+dados.certificados.find(
+c => c.codigo === codigo
+);
+
+const resultado =
+document.getElementById("resultado");
+
+if(certificado){
+
+resultado.innerHTML = `
+<h2>Certificado Válido</h2>
+
+<p><b>Aluno:</b>
+${certificado.nome}</p>
+
+<p><b>Curso:</b>
+${certificado.curso}</p>
+
+<p><b>Status:</b>
+${certificado.status}</p>
+`;
+
+}else{
+
+resultado.innerHTML =
+"<h2>Certificado não encontrado</h2>";
+
+}
+
+}
+
+async function salvarCertificado(){
+
+const dados =
+await carregarDados();
+
+dados.certificados.push({
+
+codigo:
+Date.now().toString(),
+
+nome:
+document.getElementById("nome").value,
+
+cpf:
+document.getElementById("cpf").value,
+
+curso:
+document.getElementById("curso").value,
+
+status:
+"Válido"
+
+});
+
+await fetch(API_URL,{
+method:'PUT',
+headers:{
+'Content-Type':'application/json',
+'X-Master-Key':API_KEY
+},
+body:JSON.stringify(dados)
+});
+
+alert('Certificado salvo');
+
+}
