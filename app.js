@@ -45,6 +45,9 @@ resultado.innerHTML = `
 <p><b>Aluno:</b>
 ${certificado.nome}</p>
 
+<p><b>Carga horária:</b>
+${certificado.cargaHoraria}</p>
+
 <p><b>Curso:</b>
 ${certificado.curso}</p>
 
