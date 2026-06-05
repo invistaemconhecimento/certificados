@@ -45,11 +45,17 @@ resultado.innerHTML = `
 <p><b>Aluno:</b>
 ${certificado.nome}</p>
 
-<p><b>Carga horária:</b>
-${certificado.cargaHoraria}</p>
-
 <p><b>Curso:</b>
 ${certificado.curso}</p>
+
+<p><b>Carga Horária:</b>
+${certificado.cargaHoraria}</p>
+
+<p><b>Aproveitamento:</b>
+${certificado.aproveitamento}</p>
+
+<p><b>Data de Conclusão:</b>
+${certificado.dataConclusao}</p>
 
 <p><b>Status:</b>
 ${certificado.status}</p>
