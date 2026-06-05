@@ -2,27 +2,52 @@
 <html lang="pt-BR">
 <head>
 <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Validação de Certificados</title>
 <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
-<div class="container">
+<header class="topo">
 
-<h1>Staff Consultoria e Treinamentos</h1>
-<h2>Validação de Certificados - v3</h2>
-<h3>Consulte a autenticidade dos certificados emitidos pela STAFF CONSULTORIA.</h3>
+    <img src="logo.png" alt="Staff Consultoria" class="logo">
 
-<input type="text" id="codigo"
-placeholder="Digite o código">
+</header>
 
-<button onclick="consultar()">
-Consultar
-</button>
+<main class="conteudo">
 
-<div id="resultado"></div>
+    <h1>Validação de Certificados</h1>
 
-</div>
+    <p class="subtitulo">
+        Consulte a autenticidade dos certificados emitidos pela STAFF CONSULTORIA.
+    </p>
+
+    <div class="caixa-pesquisa">
+
+        <input
+            type="text"
+            id="codigo"
+            placeholder="Digite o código do certificado">
+
+        <button onclick="consultar()">
+            Consultar
+        </button>
+
+    </div>
+
+    <div id="resultado"></div>
+
+</main>
+
+<footer>
+
+    STAFF CONSULTORIA — CNPJ: 39.881.904/0001-09
+
+    <br>
+
+    Belém — Pará
+
+</footer>
 
 <script src="app.js"></script>
 
