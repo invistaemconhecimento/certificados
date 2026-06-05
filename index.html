@@ -1,74 +1,27 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-
-  <meta charset="UTF-8">
-
-  <meta
-    name="viewport"
-    content="width=device-width, initial-scale=1.0"
-  >
-
-  <title>
-    Verificação de Certificados
-  </title>
-
-  <link
-    rel="stylesheet"
-    href="css/style.css"
-  >
-
+<meta charset="UTF-8">
+<title>Validação de Certificados</title>
+<link rel="stylesheet" href="style.css">
 </head>
-
 <body>
 
-  <div class="container">
+<div class="container">
+<h1>Validação de Certificados</h1>
 
-    <div class="header">
+<input type="text" id="codigo"
+placeholder="Digite o código">
 
-      <h1>
-        🎓 Verificação de Certificados
-      </h1>
+<button onclick="consultar()">
+Consultar
+</button>
 
-      <p class="subtitle">
-        Consulte a autenticidade do certificado
-      </p>
+<div id="resultado"></div>
 
-    </div>
+</div>
 
-    <div class="card">
-
-      <div class="search-box">
-
-        <input
-          type="text"
-          id="codigo"
-          placeholder="Digite o código do certificado"
-        >
-
-        <button
-          type="button"
-          onclick="verificarCertificado()"
-        >
-          Verificar
-        </button>
-
-      </div>
-
-      <div
-        id="loading"
-        style="display:none;"
-      >
-        Carregando...
-      </div>
-
-      <div id="result"></div>
-
-    </div>
-
-  </div>
-
-  <script src="js/app.js"></script>
+<script src="app.js"></script>
 
 </body>
 </html>
