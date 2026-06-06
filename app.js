@@ -46,7 +46,7 @@ async function consultar() {
         );
 
         resultado.innerHTML = `
-        <h2>Certificado Válido</h2>
+        <h2>✅ Certificado Válido</h2>
 
         <p><b>Código:</b>
         ${certificado.codigo}</p>
@@ -71,7 +71,27 @@ async function consultar() {
 
         <p><b>Status:</b>
         ${certificado.status}</p>
+
+        <hr>
+
+        <h3>QR Code de Verificação</h3>
+
+        <div id="qrcode"></div>
         `;
+
+        const qrDiv =
+        document.getElementById("qrcode");
+
+        qrDiv.innerHTML = "";
+
+        new QRCode(qrDiv,{
+            text:
+            "Certificado: " +
+            certificado.codigo,
+
+            width:180,
+            height:180
+        });
 
     }else{
 
