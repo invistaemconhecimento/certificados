@@ -45,44 +45,58 @@ async function consultar() {
             '$1.***.***-$4'
         );
 
-        resultado.innerHTML = `
-        <h2>Certificado Válido</h2>
 
-        <p><b>Código:</b>
-        ${certificado.codigo}</p>
+    resultado.innerHTML = `          // inicia nova linha para o QRCode
+    <h2>Certificado Válido</h2>
 
-        <p><b>Aluno:</b>
-        ${certificado.nome}</p>
+    <p><b>Código:</b>
+    ${certificado.codigo}</p>
 
-        <p><b>CPF:</b>
-        ${cpfMascarado}</p>
+    <p><b>Aluno:</b>
+    ${certificado.nome}</p>
 
-        <p><b>Curso:</b>
-        ${certificado.curso}</p>
+    <p><b>CPF:</b>
+    ${cpfMascarado}</p>
 
-        <p><b>Carga Horária:</b>
-        ${certificado.cargaHoraria}</p>
+    <p><b>Curso:</b>
+    ${certificado.curso}</p>
 
-        <p><b>Aproveitamento:</b>
-        ${certificado.aproveitamento}</p>
+    <p><b>Carga Horária:</b>
+    ${certificado.cargaHoraria}</p>
 
-        <p><b>Data de Conclusão:</b>
-        ${certificado.dataConclusao}</p>
+    <p><b>Aproveitamento:</b>
+    ${certificado.aproveitamento}</p>
 
-        <p><b>Status:</b>
-        ${certificado.status}</p>
-        <div id="qrcode"></div> //Linha nova. Implementação do QRCode
-        `;
+    <p><b>Data de Conclusão:</b>
+    ${certificado.dataConclusao}</p>
 
-    }else{
+    <p><b>Status:</b>
+    ${certificado.status}</p>
 
-        resultado.innerHTML =
-        "<h2>❌ Certificado não encontrado</h2>";
+    <div id="qrcode"></div>
+    `;
 
-    }
+    const urlValidacao =
+    window.location.origin +
+    window.location.pathname +
+    '?codigo=' +
+    certificado.codigo;
 
-}
+    new QRCode(
+    document.getElementById("qrcode"),
+    {
+        text: urlValidacao,
+        width: 180,
+        height: 180
+    });
 
+}else{
+
+    resultado.innerHTML =
+    "<h2>❌ Certificado não encontrado</h2>";
+
+}        //aqui termina 
+    
 async function salvarCertificado(){
 
     const dados =
