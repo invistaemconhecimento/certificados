@@ -24,7 +24,7 @@ async function carregarDados() {
 async function consultar() {
 
     const codigo =
-    document.getElementById("codigo").value;
+    document.getElementById("codigo").value.trim();
 
     const dados =
     await carregarDados();
@@ -45,58 +45,64 @@ async function consultar() {
             '$1.***.***-$4'
         );
 
+        resultado.innerHTML = `
+        <h2>✅ Certificado Válido</h2>
 
-    resultado.innerHTML = `          // inicia nova linha para o QRCode
-    <h2>Certificado Válido</h2>
+        <p><b>Código:</b>
+        ${certificado.codigo}</p>
 
-    <p><b>Código:</b>
-    ${certificado.codigo}</p>
+        <p><b>Aluno:</b>
+        ${certificado.nome}</p>
 
-    <p><b>Aluno:</b>
-    ${certificado.nome}</p>
+        <p><b>CPF:</b>
+        ${cpfMascarado}</p>
 
-    <p><b>CPF:</b>
-    ${cpfMascarado}</p>
+        <p><b>Curso:</b>
+        ${certificado.curso}</p>
 
-    <p><b>Curso:</b>
-    ${certificado.curso}</p>
+        <p><b>Carga Horária:</b>
+        ${certificado.cargaHoraria}</p>
 
-    <p><b>Carga Horária:</b>
-    ${certificado.cargaHoraria}</p>
+        <p><b>Aproveitamento:</b>
+        ${certificado.aproveitamento}</p>
 
-    <p><b>Aproveitamento:</b>
-    ${certificado.aproveitamento}</p>
+        <p><b>Data de Conclusão:</b>
+        ${certificado.dataConclusao}</p>
 
-    <p><b>Data de Conclusão:</b>
-    ${certificado.dataConclusao}</p>
+        <p><b>Status:</b>
+        ${certificado.status}</p>
 
-    <p><b>Status:</b>
-    ${certificado.status}</p>
+        <br>
 
-    <div id="qrcode"></div>
-    `;
+        <h3>QR Code de Verificação</h3>
 
-    const urlValidacao =
-    window.location.origin +
-    window.location.pathname +
-    '?codigo=' +
-    certificado.codigo;
+        <div id="qrcode"></div>
+        `;
 
-    new QRCode(
-    document.getElementById("qrcode"),
-    {
-        text: urlValidacao,
-        width: 180,
-        height: 180
-    });
+        const urlValidacao =
+        window.location.origin +
+        window.location.pathname +
+        '?codigo=' +
+        certificado.codigo;
 
-}else{
+        new QRCode(
+            document.getElementById("qrcode"),
+            {
+                text: urlValidacao,
+                width: 180,
+                height: 180
+            }
+        );
 
-    resultado.innerHTML =
-    "<h2>❌ Certificado não encontrado</h2>";
+    }else{
 
-}        //aqui termina 
-    
+        resultado.innerHTML =
+        "<h2>❌ Certificado não encontrado</h2>";
+
+    }
+
+}
+
 async function salvarCertificado(){
 
     const dados =
@@ -136,21 +142,21 @@ async function salvarCertificado(){
 
 window.onload = function(){
 
-const params =
-new URLSearchParams(
-window.location.search
-);
+    const params =
+    new URLSearchParams(
+        window.location.search
+    );
 
-const codigo =
-params.get("codigo");
+    const codigo =
+    params.get("codigo");
 
-if(codigo){
+    if(codigo){
 
-document.getElementById("codigo").value =
-codigo;
+        document.getElementById("codigo").value =
+        codigo;
 
-consultar();
+        consultar();
 
-}
+    }
 
 };
