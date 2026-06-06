@@ -71,6 +71,7 @@ async function consultar() {
 
         <p><b>Status:</b>
         ${certificado.status}</p>
+        <div id="qrcode"></div> //Linha nova. Implementação do QRCode
         `;
 
     }else{
