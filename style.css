@@ -21,3 +21,75 @@
 
     opacity:.9;
 }
+
+.caixa-admin{
+
+    background:#ffffff;
+
+    padding:25px;
+
+    border-radius:12px;
+
+    box-shadow:0 2px 10px rgba(0,0,0,.08);
+
+    margin-bottom:25px;
+}
+
+.caixa-admin h1,
+.caixa-admin h2{
+
+    color:#0f172a;
+
+    margin-bottom:15px;
+}
+
+.caixa-admin input{
+
+    width:100%;
+
+    padding:12px;
+
+    margin-bottom:12px;
+
+    border:1px solid #d1d5db;
+
+    border-radius:8px;
+
+    box-sizing:border-box;
+}
+
+.botoes-admin{
+
+    display:flex;
+
+    gap:10px;
+
+    flex-wrap:wrap;
+
+    margin-top:10px;
+}
+
+.botoes-admin button{
+
+    flex:1;
+
+    min-width:200px;
+}
+
+#listaCertificados > div{
+
+    background:#f8fafc;
+
+    border:1px solid #e5e7eb !important;
+
+    border-radius:10px !important;
+
+    padding:15px !important;
+
+    margin-bottom:15px !important;
+}
+
+#listaCertificados button{
+
+    margin-right:8px;
+}
