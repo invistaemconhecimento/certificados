@@ -2,6 +2,7 @@
 <html lang="pt-BR">
 <head>
 <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Painel Administrativo</title>
 <link rel="stylesheet" href="style.css">
 </head>
@@ -9,19 +10,53 @@
 
 <div class="container">
 
-<h1>Cadastrar Certificado</h1>
+    <h1>Painel de Certificados</h1>
 
-<input id="nome" placeholder="Nome">
-<input id="cpf" placeholder="CPF">
-<input id="curso" placeholder="Curso">
+    <input
+        id="codigoCadastro"
+        placeholder="Código do Certificado">
 
-<button onclick="salvarCertificado()">
-Salvar
-</button>
+    <input
+        id="nome"
+        placeholder="Nome do Aluno">
+
+    <input
+        id="cpf"
+        placeholder="CPF">
+
+    <input
+        id="curso"
+        placeholder="Curso">
+
+    <input
+        id="cargaHoraria"
+        placeholder="Carga Horária">
+
+    <input
+        id="aproveitamento"
+        placeholder="Aproveitamento">
+
+    <input
+        id="dataConclusao"
+        placeholder="Data de Conclusão">
+
+    <input
+        id="pdfUrl"
+        placeholder="Link do PDF">
+
+    <button onclick="salvarCertificado()">
+        Salvar Certificado
+    </button>
+
+    <hr>
+
+    <h2>Certificados Cadastrados</h2>
+
+    <div id="listaCertificados"></div>
 
 </div>
 
-<script src="app.js"></script>
+<script src="admin.js"></script>
 
 </body>
 </html>
