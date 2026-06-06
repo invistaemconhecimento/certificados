@@ -46,7 +46,7 @@ async function consultar() {
         );
 
         resultado.innerHTML = `
-        <h2>Certificado Válido</h2>
+        <h2>✅ Certificado Válido</h2>
 
         <p><b>Código:</b>
         ${certificado.codigo}</p>
@@ -72,6 +72,15 @@ async function consultar() {
         <p><b>Status:</b>
         ${certificado.status}</p>
 
+        ${certificado.pdfUrl ? `
+        <a
+            href="${certificado.pdfUrl}"
+            target="_blank"
+            class="btn-pdf">
+            📄 Visualizar Certificado
+        </a>
+        ` : ''}
+
         <hr>
 
         <h3>QR Code de Verificação</h3>
@@ -90,53 +99,16 @@ async function consultar() {
 
         new QRCode(qrDiv,{
             text: urlValidacao,
-            width:95,
-            height:95
+            width:180,
+            height:180
         });
 
     }else{
 
         resultado.innerHTML =
-        "<h2>Certificado não encontrado</h2>";
+        "<h2>❌ Certificado não encontrado</h2>";
 
     }
-
-}
-
-async function salvarCertificado(){
-
-    const dados =
-    await carregarDados();
-
-    dados.certificados.push({
-
-        codigo:
-        Date.now().toString(),
-
-        nome:
-        document.getElementById("nome").value,
-
-        cpf:
-        document.getElementById("cpf").value,
-
-        curso:
-        document.getElementById("curso").value,
-
-        status:
-        "Válido"
-
-    });
-
-    await fetch(API_URL,{
-        method:'PUT',
-        headers:{
-            'Content-Type':'application/json',
-            'X-Master-Key':API_KEY
-        },
-        body:JSON.stringify(dados)
-    });
-
-    alert('Certificado salvo');
 
 }
 
