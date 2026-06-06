@@ -3,62 +3,99 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Painel Administrativo</title>
+<title>Painel Administrativo - Staff Consultoria</title>
+
 <link rel="stylesheet" href="style.css">
+
 </head>
 <body>
 
-<div class="container">
+<header class="topo">
 
-    <h1>Painel de Certificados</h1>
+    <img src="logo.png"
+         alt="Staff Consultoria"
+         class="logo">
 
-    <input
-        id="codigoCadastro"
-        placeholder="Código do Certificado">
+</header>
 
-    <input
-        id="nome"
-        placeholder="Nome do Aluno">
+<main class="conteudo">
 
-    <input
-        id="cpf"
-        placeholder="CPF">
+    <div class="caixa-admin">
 
-    <input
-        id="curso"
-        placeholder="Curso">
+        <h1>Painel Administrativo</h1>
 
-    <input
-        id="cargaHoraria"
-        placeholder="Carga Horária">
+        <p class="subtitulo">
+            Cadastro e gerenciamento de certificados.
+        </p>
 
-    <input
-        id="aproveitamento"
-        placeholder="Aproveitamento">
+        <input
+            id="codigoCadastro"
+            placeholder="Código do Certificado">
 
-    <input
-        id="dataConclusao"
-        placeholder="Data de Conclusão">
+        <input
+            id="nome"
+            placeholder="Nome do Aluno">
 
-    <input
-        id="pdfUrl"
-        placeholder="Link do PDF">
+        <input
+            id="cpf"
+            placeholder="CPF">
 
-    <button onclick="salvarCertificado()">
-        Salvar Certificado
-    </button>
+        <input
+            id="curso"
+            placeholder="Curso">
 
-    <button onclick="atualizarCertificado()" id="btnAtualizar" style="display:none;">
-        Atualizar Certificado
-    </button>
+        <input
+            id="cargaHoraria"
+            placeholder="Carga Horária">
 
-    <hr>
+        <input
+            id="aproveitamento"
+            placeholder="Aproveitamento">
 
-    <h2>Certificados Cadastrados</h2>
+        <input
+            id="dataConclusao"
+            placeholder="Data de Conclusão">
 
-    <div id="listaCertificados"></div>
+        <input
+            id="pdfUrl"
+            placeholder="Link do PDF">
 
-</div>
+        <div class="botoes-admin">
+
+            <button onclick="salvarCertificado()">
+                Salvar Certificado
+            </button>
+
+            <button
+                id="btnAtualizar"
+                onclick="atualizarCertificado()"
+                style="display:none;">
+                Atualizar Certificado
+            </button>
+
+        </div>
+
+    </div>
+
+    <div class="caixa-admin">
+
+        <h2>Certificados Cadastrados</h2>
+
+        <div id="listaCertificados"></div>
+
+    </div>
+
+</main>
+
+<footer>
+
+    STAFF CONSULTORIA — CNPJ: 39.881.904/0001-09
+
+    <br>
+
+    Belém - Pará
+
+</footer>
 
 <script src="admin.js"></script>
 
