@@ -84,11 +84,12 @@ async function consultar() {
 
         qrDiv.innerHTML = "";
 
-        new QRCode(qrDiv,{
-            text:
-            "Certificado: " +
-            certificado.codigo,
+        const urlValidacao =
+        "https://invistaemconhecimento.github.io/certificados/?codigo=" +
+        certificado.codigo;
 
+        new QRCode(qrDiv,{
+            text: urlValidacao,
             width:180,
             height:180
         });
@@ -138,3 +139,24 @@ async function salvarCertificado(){
     alert('Certificado salvo');
 
 }
+
+window.onload = function() {
+
+    const parametros =
+    new URLSearchParams(
+        window.location.search
+    );
+
+    const codigo =
+    parametros.get("codigo");
+
+    if(codigo){
+
+        document.getElementById("codigo").value =
+        codigo;
+
+        consultar();
+
+    }
+
+};
