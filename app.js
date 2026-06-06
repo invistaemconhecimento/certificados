@@ -90,8 +90,8 @@ async function consultar() {
 
         new QRCode(qrDiv,{
             text: urlValidacao,
-            width:90,
-            height:90
+            width:95,
+            height:95
         });
 
     }else{
