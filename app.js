@@ -7,6 +7,8 @@ const API_KEY =
 const API_URL =
 `https://api.jsonbin.io/v3/b/${BIN_ID}`;
 
+let indiceEdicao = null;
+
 async function carregarDados() {
 
     const response = await fetch(API_URL,{
@@ -18,117 +20,224 @@ async function carregarDados() {
     const data = await response.json();
 
     return data.record;
-
 }
 
-async function consultar() {
+async function salvarCertificado(){
 
-    const codigo =
-    document.getElementById("codigo").value;
+    const dados =
+    await carregarDados();
+
+    dados.certificados.push({
+
+        codigo:
+        document.getElementById("codigoCadastro").value,
+
+        nome:
+        document.getElementById("nome").value,
+
+        cpf:
+        document.getElementById("cpf").value,
+
+        curso:
+        document.getElementById("curso").value,
+
+        cargaHoraria:
+        document.getElementById("cargaHoraria").value,
+
+        aproveitamento:
+        document.getElementById("aproveitamento").value,
+
+        dataConclusao:
+        document.getElementById("dataConclusao").value,
+
+        pdfUrl:
+        document.getElementById("pdfUrl").value,
+
+        status:
+        "Válido"
+
+    });
+
+    await salvarNoJson(dados);
+
+    alert('Certificado salvo com sucesso!');
+
+    limparFormulario();
+
+    listarCertificados();
+}
+
+async function editarCertificado(index){
 
     const dados =
     await carregarDados();
 
     const certificado =
-    dados.certificados.find(
-        c => c.codigo === codigo
-    );
+    dados.certificados[index];
 
-    const resultado =
-    document.getElementById("resultado");
+    indiceEdicao = index;
 
-    if(certificado){
+    document.getElementById("codigoCadastro").value =
+    certificado.codigo;
 
-        const cpfMascarado =
-        certificado.cpf.replace(
-            /(\d{3})\.(\d{3})\.(\d{3})-(\d{2})/,
-            '$1.***.***-$4'
-        );
+    document.getElementById("nome").value =
+    certificado.nome;
 
-        resultado.innerHTML = `
-        <h2>✅ Certificado Válido</h2>
+    document.getElementById("cpf").value =
+    certificado.cpf;
 
-        <p><b>Código:</b>
-        ${certificado.codigo}</p>
+    document.getElementById("curso").value =
+    certificado.curso;
 
-        <p><b>Aluno:</b>
-        ${certificado.nome}</p>
+    document.getElementById("cargaHoraria").value =
+    certificado.cargaHoraria;
 
-        <p><b>CPF:</b>
-        ${cpfMascarado}</p>
+    document.getElementById("aproveitamento").value =
+    certificado.aproveitamento;
 
-        <p><b>Curso:</b>
-        ${certificado.curso}</p>
+    document.getElementById("dataConclusao").value =
+    certificado.dataConclusao;
 
-        <p><b>Carga Horária:</b>
-        ${certificado.cargaHoraria}</p>
+    document.getElementById("pdfUrl").value =
+    certificado.pdfUrl || '';
 
-        <p><b>Aproveitamento:</b>
-        ${certificado.aproveitamento}</p>
+    document.getElementById("btnAtualizar").style.display =
+    "inline-block";
 
-        <p><b>Data de Conclusão:</b>
-        ${certificado.dataConclusao}</p>
-
-        <p><b>Status:</b>
-        ${certificado.status}</p>
-
-        ${certificado.pdfUrl ? `
-        <a
-            href="${certificado.pdfUrl}"
-            target="_blank"
-            class="btn-pdf">
-            📄 Visualizar Certificado
-        </a>
-        ` : ''}
-
-        <hr>
-
-        <h3>QR Code de Verificação</h3>
-
-        <div id="qrcode"></div>
-        `;
-
-        const qrDiv =
-        document.getElementById("qrcode");
-
-        qrDiv.innerHTML = "";
-
-        const urlValidacao =
-        "https://invistaemconhecimento.github.io/certificados/?codigo=" +
-        certificado.codigo;
-
-        new QRCode(qrDiv,{
-            text: urlValidacao,
-            width:180,
-            height:180
-        });
-
-    }else{
-
-        resultado.innerHTML =
-        "<h2>❌ Certificado não encontrado</h2>";
-
-    }
-
+    window.scrollTo({
+        top:0,
+        behavior:"smooth"
+    });
 }
 
-window.onload = function() {
+async function atualizarCertificado(){
 
-    const parametros =
-    new URLSearchParams(
-        window.location.search
-    );
-
-    const codigo =
-    parametros.get("codigo");
-
-    if(codigo){
-
-        document.getElementById("codigo").value =
-        codigo;
-
-        consultar();
-
+    if(indiceEdicao === null){
+        return;
     }
 
-};
+    const dados =
+    await carregarDados();
+
+    dados.certificados[indiceEdicao] = {
+
+        codigo:
+        document.getElementById("codigoCadastro").value,
+
+        nome:
+        document.getElementById("nome").value,
+
+        cpf:
+        document.getElementById("cpf").value,
+
+        curso:
+        document.getElementById("curso").value,
+
+        cargaHoraria:
+        document.getElementById("cargaHoraria").value,
+
+        aproveitamento:
+        document.getElementById("aproveitamento").value,
+
+        dataConclusao:
+        document.getElementById("dataConclusao").value,
+
+        pdfUrl:
+        document.getElementById("pdfUrl").value,
+
+        status:"Válido"
+
+    };
+
+    await salvarNoJson(dados);
+
+    alert("Certificado atualizado com sucesso!");
+
+    indiceEdicao = null;
+
+    document.getElementById("btnAtualizar").style.display =
+    "none";
+
+    limparFormulario();
+
+    listarCertificados();
+}
+
+async function excluirCertificado(index){
+
+    if(!confirm("Deseja excluir este certificado?")){
+        return;
+    }
+
+    const dados =
+    await carregarDados();
+
+    dados.certificados.splice(index,1);
+
+    await salvarNoJson(dados);
+
+    listarCertificados();
+}
+
+async function salvarNoJson(dados){
+
+    await fetch(API_URL,{
+        method:'PUT',
+        headers:{
+            'Content-Type':'application/json',
+            'X-Master-Key':API_KEY
+        },
+        body:JSON.stringify(dados)
+    });
+}
+
+async function listarCertificados(){
+
+    const dados =
+    await carregarDados();
+
+    const lista =
+    document.getElementById("listaCertificados");
+
+    lista.innerHTML = "";
+
+    dados.certificados.forEach((certificado,index)=>{
+
+        lista.innerHTML += `
+        <div style="
+            padding:10px;
+            border:1px solid #ddd;
+            margin-bottom:10px;
+            border-radius:8px;
+        ">
+            <strong>${certificado.codigo}</strong><br>
+
+            ${certificado.nome}<br>
+
+            ${certificado.curso}<br><br>
+
+            <button onclick="editarCertificado(${index})">
+                ✏️ Editar
+            </button>
+
+            <button onclick="excluirCertificado(${index})">
+                🗑️ Excluir
+            </button>
+        </div>
+        `;
+    });
+}
+
+function limparFormulario(){
+
+    document.getElementById("codigoCadastro").value = "";
+    document.getElementById("nome").value = "";
+    document.getElementById("cpf").value = "";
+    document.getElementById("curso").value = "";
+    document.getElementById("cargaHoraria").value = "";
+    document.getElementById("aproveitamento").value = "";
+    document.getElementById("dataConclusao").value = "";
+    document.getElementById("pdfUrl").value = "";
+}
+
+window.onload = listarCertificados;
