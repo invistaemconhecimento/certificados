@@ -133,3 +133,24 @@ async function salvarCertificado(){
     alert('Certificado salvo');
 
 }
+
+window.onload = function(){
+
+const params =
+new URLSearchParams(
+window.location.search
+);
+
+const codigo =
+params.get("codigo");
+
+if(codigo){
+
+document.getElementById("codigo").value =
+codigo;
+
+consultar();
+
+}
+
+};
