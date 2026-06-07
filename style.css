@@ -1,0 +1,23 @@
+.btn-pdf{
+
+    display:inline-block;
+
+    margin-top:15px;
+
+    padding:12px 20px;
+
+    background:#16a34a;
+
+    color:white;
+
+    text-decoration:none;
+
+    border-radius:8px;
+
+    font-weight:bold;
+}
+
+.btn-pdf:hover{
+
+    opacity:.9;
+}
